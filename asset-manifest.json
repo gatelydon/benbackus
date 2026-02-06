@@ -1,0 +1,30 @@
+{
+  "files": {
+    "main.css": "/benbackus/static/css/main.c75a1a27.css",
+    "main.js": "/benbackus/static/js/main.60842835.js",
+    "static/media/waste_sensor.png": "/benbackus/static/media/waste_sensor.25ffe459d77237b4a58f.png",
+    "static/media/time.jpg": "/benbackus/static/media/time.3187adaa1221a6fd19a2.jpg",
+    "static/media/into_the_vanity.jpg": "/benbackus/static/media/into_the_vanity.b56563bda2464aa2f2a5.jpg",
+    "static/media/robotics.png": "/benbackus/static/media/robotics.6a4878dcea1477345ca5.png",
+    "static/media/in_gods_iris.jpg": "/benbackus/static/media/in_gods_iris.141eff832c2807b48f34.jpg",
+    "static/media/claudio_y_jasna.jpg": "/benbackus/static/media/claudio_y_jasna.a02169b5d177bf543309.jpg",
+    "static/media/textures_and_colors.jpg": "/benbackus/static/media/textures_and_colors.6fc95eae3c180a004236.jpg",
+    "static/media/ad_hunter_poster.png": "/benbackus/static/media/ad_hunter_poster.998e7733feac942b05b6.png",
+    "static/media/qualia_cookbook.png": "/benbackus/static/media/qualia_cookbook.d169f31cfb9f434522d7.png",
+    "static/media/plot_the_plot.png": "/benbackus/static/media/plot_the_plot.12cc27ef9e48d063d603.png",
+    "static/media/Backus_political_philosophy.pdf": "/benbackus/static/media/Backus_political_philosophy.db94f8851f282b0ee3e0.pdf",
+    "static/media/Backus_PenalLotteries.pdf": "/benbackus/static/media/Backus_PenalLotteries.5bdd2481668ee8cee2b1.pdf",
+    "static/media/Backus_Love_Story.pdf": "/benbackus/static/media/Backus_Love_Story.6dc8d5d480b274861d55.pdf",
+    "static/media/Backus_Cognition.pdf": "/benbackus/static/media/Backus_Cognition.aef8a9aa809cfa941ba9.pdf",
+    "static/media/Meta-realism.pdf": "/benbackus/static/media/Meta-realism.b8a9e4b6c66cc7810eb6.pdf",
+    "static/media/Backus_Resume_2024.pdf": "/benbackus/static/media/Backus_Resume_2024.eca239a983b4134a119b.pdf",
+    "static/media/Metaphysics_complex_present_paper.pdf": "/benbackus/static/media/Metaphysics_complex_present_paper.baaae8177f6f98f61533.pdf",
+    "index.html": "/benbackus/index.html",
+    "main.c75a1a27.css.map": "/benbackus/static/css/main.c75a1a27.css.map",
+    "main.60842835.js.map": "/benbackus/static/js/main.60842835.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c75a1a27.css",
+    "static/js/main.60842835.js"
+  ]
+}
