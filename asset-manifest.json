@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/benbackus/static/css/main.8bf2ec84.css",
-    "main.js": "/benbackus/static/js/main.6f000b50.js",
+    "main.css": "/benbackus/static/css/main.cf91ebd6.css",
+    "main.js": "/benbackus/static/js/main.c1600614.js",
     "static/media/waste_sensor.png": "/benbackus/static/media/waste_sensor.25ffe459d77237b4a58f.png",
     "static/media/time.jpg": "/benbackus/static/media/time.3187adaa1221a6fd19a2.jpg",
     "static/media/into_the_vanity.jpg": "/benbackus/static/media/into_the_vanity.b56563bda2464aa2f2a5.jpg",
@@ -12,19 +12,17 @@
     "static/media/ad_hunter_poster.png": "/benbackus/static/media/ad_hunter_poster.998e7733feac942b05b6.png",
     "static/media/qualia_cookbook.png": "/benbackus/static/media/qualia_cookbook.d169f31cfb9f434522d7.png",
     "static/media/plot_the_plot.png": "/benbackus/static/media/plot_the_plot.12cc27ef9e48d063d603.png",
-    "static/media/Backus_political_philosophy.pdf": "/benbackus/static/media/Backus_political_philosophy.db94f8851f282b0ee3e0.pdf",
     "static/media/Backus_PenalLotteries.pdf": "/benbackus/static/media/Backus_PenalLotteries.5bdd2481668ee8cee2b1.pdf",
     "static/media/Backus_Love_Story.pdf": "/benbackus/static/media/Backus_Love_Story.6dc8d5d480b274861d55.pdf",
     "static/media/Backus_Cognition.pdf": "/benbackus/static/media/Backus_Cognition.aef8a9aa809cfa941ba9.pdf",
-    "static/media/Meta-realism.pdf": "/benbackus/static/media/Meta-realism.b8a9e4b6c66cc7810eb6.pdf",
     "static/media/Backus_Resume_2024.pdf": "/benbackus/static/media/Backus_Resume_2024.eca239a983b4134a119b.pdf",
     "static/media/Metaphysics_complex_present_paper.pdf": "/benbackus/static/media/Metaphysics_complex_present_paper.baaae8177f6f98f61533.pdf",
     "index.html": "/benbackus/index.html",
-    "main.8bf2ec84.css.map": "/benbackus/static/css/main.8bf2ec84.css.map",
-    "main.6f000b50.js.map": "/benbackus/static/js/main.6f000b50.js.map"
+    "main.cf91ebd6.css.map": "/benbackus/static/css/main.cf91ebd6.css.map",
+    "main.c1600614.js.map": "/benbackus/static/js/main.c1600614.js.map"
   },
   "entrypoints": [
-    "static/css/main.8bf2ec84.css",
-    "static/js/main.6f000b50.js"
+    "static/css/main.cf91ebd6.css",
+    "static/js/main.c1600614.js"
   ]
 }
