@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/benbackus/static/css/main.cbe5a0b0.css",
-    "main.js": "/benbackus/static/js/main.ce07b171.js",
+    "main.js": "/benbackus/static/js/main.e007c9ef.js",
     "static/media/waste_sensor.png": "/benbackus/static/media/waste_sensor.25ffe459d77237b4a58f.png",
     "static/media/time.jpg": "/benbackus/static/media/time.3187adaa1221a6fd19a2.jpg",
     "static/media/into_the_vanity.jpg": "/benbackus/static/media/into_the_vanity.b56563bda2464aa2f2a5.jpg",
@@ -19,10 +19,10 @@
     "static/media/Metaphysics_complex_present_paper.pdf": "/benbackus/static/media/Metaphysics_complex_present_paper.baaae8177f6f98f61533.pdf",
     "index.html": "/benbackus/index.html",
     "main.cbe5a0b0.css.map": "/benbackus/static/css/main.cbe5a0b0.css.map",
-    "main.ce07b171.js.map": "/benbackus/static/js/main.ce07b171.js.map"
+    "main.e007c9ef.js.map": "/benbackus/static/js/main.e007c9ef.js.map"
   },
   "entrypoints": [
     "static/css/main.cbe5a0b0.css",
-    "static/js/main.ce07b171.js"
+    "static/js/main.e007c9ef.js"
   ]
 }
