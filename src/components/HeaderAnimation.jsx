@@ -14,7 +14,7 @@ const CONFIG = {
   rotateWithPosition: false,
   animatedRotation: true,
   rotationSpeed: 0.5,
-  animationSpeed: 50,
+  animationSpeed: 20,
 };
 
 // Star3 SVG path
