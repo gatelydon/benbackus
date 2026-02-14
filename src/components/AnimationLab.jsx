@@ -389,6 +389,29 @@ const AnimationLab = () => {
     return () => clearInterval(animationRef.current);
   }, [isPlaying, maxFrames, config.animationSpeed]);
 
+  // Scroll wheel control on canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleWheel = (e) => {
+      e.preventDefault();
+      // Scroll down = advance, scroll up = reverse
+      // Use deltaY normalized to steps (divide by ~50 for reasonable speed)
+      const steps = Math.sign(e.deltaY) * Math.max(1, Math.floor(Math.abs(e.deltaY) / 30));
+      setCurrentFrame(prev => {
+        let next = prev + steps;
+        // Wrap around
+        if (next > maxFrames) next = next - maxFrames;
+        if (next < 0) next = maxFrames + next;
+        return Math.max(0, Math.min(maxFrames, next));
+      });
+    };
+
+    canvas.addEventListener('wheel', handleWheel, { passive: false });
+    return () => canvas.removeEventListener('wheel', handleWheel);
+  }, [maxFrames]);
+
   const handleConfigChange = (key, value) => {
     setConfig(prev => ({ ...prev, [key]: value }));
   };
