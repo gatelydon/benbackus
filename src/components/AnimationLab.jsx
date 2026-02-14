@@ -37,7 +37,78 @@ const DEFAULT_CONFIG = {
   gradientStart: '#ffffff',
   gradientEnd: '#888888',
   rotateWithPosition: true,
-  animationSpeed: 50, // ms per shape
+  animationSpeed: 50,
+};
+
+// SVG path generators
+const getShapePath = (shape, w, h, variance = 0) => {
+  const v = variance;
+  switch (shape) {
+    case 'circle':
+      return { type: 'ellipse', cx: w/2, cy: h/2, rx: w/2, ry: h/2 };
+    case 'ellipse':
+      return { type: 'ellipse', cx: w/2, cy: h/2, rx: w/2 * (1 + v * 0.3), ry: h/2 * (1 - v * 0.3) };
+    case 'square':
+    case 'rectangle':
+      return { type: 'rect', x: 0, y: 0, width: w, height: h };
+    case 'parallelogram': {
+      const skew = w * (0.2 + v * 0.1);
+      return { type: 'polygon', points: `${skew},0 ${w},0 ${w-skew},${h} 0,${h}` };
+    }
+    case 'diamond':
+      return { type: 'polygon', points: `${w/2},0 ${w},${h/2} ${w/2},${h} 0,${h/2}` };
+    case 'pentagon': {
+      const cx = w/2, cy = h/2, r = Math.min(w, h)/2;
+      const pts = [];
+      for (let i = 0; i < 5; i++) {
+        const angle = (i * 72 - 90) * Math.PI / 180;
+        pts.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
+      }
+      return { type: 'polygon', points: pts.join(' ') };
+    }
+    case 'star3':
+      return createStar(w, h, 3, 0.4);
+    case 'star4':
+      return createStar(w, h, 4, 0.4);
+    case 'star5':
+      return createStar(w, h, 5, 0.4);
+    default:
+      return { type: 'rect', x: 0, y: 0, width: w, height: h };
+  }
+};
+
+const createStar = (w, h, points, innerRatio) => {
+  const cx = w/2, cy = h/2;
+  const outerR = Math.min(w, h)/2;
+  const innerR = outerR * innerRatio;
+  const pts = [];
+  for (let i = 0; i < points * 2; i++) {
+    const angle = (i * 180 / points - 90) * Math.PI / 180;
+    const r = i % 2 === 0 ? outerR : innerR;
+    pts.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
+  }
+  return { type: 'polygon', points: pts.join(' ') };
+};
+
+// Mini shape preview for buttons
+const ShapePreview = ({ shapeId, size = 20, stroke = '#888', fill = 'none' }) => {
+  const path = getShapePath(shapeId, size, size, 0);
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {path.type === 'ellipse' && (
+        <ellipse cx={path.cx} cy={path.cy} rx={path.rx * 0.85} ry={path.ry * 0.85} 
+          stroke={stroke} fill={fill} strokeWidth="1.5" />
+      )}
+      {path.type === 'rect' && (
+        <rect x={size*0.1} y={size*0.1} width={size*0.8} height={size*0.8} 
+          stroke={stroke} fill={fill} strokeWidth="1.5" />
+      )}
+      {path.type === 'polygon' && (
+        <polygon points={path.points} stroke={stroke} fill={fill} strokeWidth="1.5" 
+          transform={`scale(0.85) translate(${size*0.09}, ${size*0.09})`} />
+      )}
+    </svg>
+  );
 };
 
 const AnimationLab = () => {
@@ -49,7 +120,6 @@ const AnimationLab = () => {
   const shapesRef = useRef([]);
   const animationRef = useRef(null);
 
-  // Update maxFrames when totalShapes changes
   useEffect(() => {
     setMaxFrames(config.totalShapes);
     if (currentFrame > config.totalShapes) {
@@ -57,54 +127,15 @@ const AnimationLab = () => {
     }
   }, [config.totalShapes, currentFrame]);
 
-  // Generate clip-path for different shapes
-  const getClipPath = useCallback((shape, variance = 0) => {
-    const v = variance; // -1 to 1 range for variation
-    switch (shape) {
-      case 'circle':
-        return 'ellipse(50% 50% at 50% 50%)';
-      case 'ellipse':
-        const rx = 50 + v * 20;
-        const ry = 50 - v * 20;
-        return `ellipse(${rx}% ${ry}% at 50% 50%)`;
-      case 'square':
-        return 'none';
-      case 'rectangle':
-        return 'none'; // handled by width/height
-      case 'parallelogram':
-        const skew = 20 + v * 10;
-        return `polygon(${skew}% 0%, 100% 0%, ${100-skew}% 100%, 0% 100%)`;
-      case 'diamond':
-        return 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)';
-      case 'pentagon':
-        return 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)';
-      case 'star3':
-        return 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
-      case 'star4':
-        return 'polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%)';
-      case 'star5':
-        return 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
-      default:
-        return 'none';
-    }
-  }, []);
-
-  // Calculate position based on arrangement
   const getPosition = useCallback((index, total, arrangement, radius, centerX, centerY) => {
     const progress = index / total;
     const angle = progress * Math.PI * 2;
     
     switch (arrangement) {
       case 'circle':
-        return {
-          x: centerX + Math.cos(angle) * radius,
-          y: centerY + Math.sin(angle) * radius,
-        };
+        return { x: centerX + Math.cos(angle) * radius, y: centerY + Math.sin(angle) * radius };
       case 'ellipse':
-        return {
-          x: centerX + Math.cos(angle) * radius * 1.5,
-          y: centerY + Math.sin(angle) * radius * 0.7,
-        };
+        return { x: centerX + Math.cos(angle) * radius * 1.5, y: centerY + Math.sin(angle) * radius * 0.7 };
       case 'square': {
         const side = Math.floor(progress * 4);
         const sideProgress = (progress * 4) % 1;
@@ -117,30 +148,21 @@ const AnimationLab = () => {
         }
       }
       case 'figure8': {
-        const t = angle;
-        return {
-          x: centerX + Math.sin(t) * radius,
-          y: centerY + Math.sin(t * 2) * radius * 0.5,
-        };
+        return { x: centerX + Math.sin(angle) * radius, y: centerY + Math.sin(angle * 2) * radius * 0.5 };
       }
       case 'spiral': {
         const spiralRadius = radius * 0.3 + (radius * 0.7 * progress);
-        return {
-          x: centerX + Math.cos(angle * 3) * spiralRadius,
-          y: centerY + Math.sin(angle * 3) * spiralRadius,
-        };
+        return { x: centerX + Math.cos(angle * 3) * spiralRadius, y: centerY + Math.sin(angle * 3) * spiralRadius };
       }
       default:
         return { x: centerX, y: centerY };
     }
   }, []);
 
-  // Clear and redraw shapes
   const renderShapes = useCallback((frameCount) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Clear existing shapes
     shapesRef.current.forEach(el => el.remove());
     shapesRef.current = [];
 
@@ -148,11 +170,8 @@ const AnimationLab = () => {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    // Calculate which shapes to show based on starting points
-    // With N starting points, we draw shapes in a pattern that creates N "arms"
     const shapesToDraw = [];
     for (let i = 0; i < frameCount; i++) {
-      // Interleave drawing across starting points
       const armIndex = i % config.startingPoints;
       const shapeInArm = Math.floor(i / config.startingPoints);
       const actualIndex = armIndex * (config.totalShapes / config.startingPoints) + shapeInArm;
@@ -162,91 +181,103 @@ const AnimationLab = () => {
     }
 
     shapesToDraw.forEach((index) => {
-      const pos = getPosition(
-        index,
-        config.totalShapes,
-        config.arrangement,
-        config.arrangementRadius,
-        centerX,
-        centerY
-      );
+      const pos = getPosition(index, config.totalShapes, config.arrangement, config.arrangementRadius, centerX, centerY);
 
-      const shape = document.createElement('div');
-      shape.className = 'lab-shape';
-
-      // Calculate dimensions
       let width = config.shapeSize;
       let height = config.shapeSize;
       
       const shapeInfo = SHAPES.find(s => s.id === config.shape);
-      if (config.randomDimensions && shapeInfo && !shapeInfo.fixedAspect) {
-        const variance = config.dimensionVariance;
-        width = config.shapeSize * (1 + (Math.random() - 0.5) * 2 * variance);
-        height = config.shapeSize * (1 + (Math.random() - 0.5) * 2 * variance);
-      }
-
-      // Calculate rotation based on position in circle
-      const rotation = config.rotateWithPosition 
-        ? (index / config.totalShapes) * 360 
+      const variance = config.randomDimensions && shapeInfo && !shapeInfo.fixedAspect
+        ? (Math.random() - 0.5) * 2 * config.dimensionVariance
         : 0;
-
-      // Build background
-      let background = config.fillColor;
-      if (config.useGradient) {
-        background = `linear-gradient(${rotation}deg, ${config.gradientStart}, ${config.gradientEnd})`;
+      
+      if (config.randomDimensions && shapeInfo && !shapeInfo.fixedAspect) {
+        width = config.shapeSize * (1 + (Math.random() - 0.5) * 2 * config.dimensionVariance);
+        height = config.shapeSize * (1 + (Math.random() - 0.5) * 2 * config.dimensionVariance);
       }
 
-      const clipPath = getClipPath(
-        config.shape,
-        config.randomDimensions ? (Math.random() - 0.5) * 2 * config.dimensionVariance : 0
-      );
+      const rotation = config.rotateWithPosition ? (index / config.totalShapes) * 360 : 0;
+      const path = getShapePath(config.shape, width, height, variance);
 
-      shape.style.cssText = `
+      // Create SVG element
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', width);
+      svg.setAttribute('height', height);
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      svg.style.cssText = `
         position: absolute;
         left: ${pos.x - width / 2}px;
         top: ${pos.y - height / 2}px;
-        width: ${width}px;
-        height: ${height}px;
-        border: 1px solid ${config.borderColor};
-        background: ${background};
         transform: rotate(${rotation}deg);
-        clip-path: ${clipPath};
         pointer-events: none;
+        overflow: visible;
       `;
 
-      canvas.appendChild(shape);
-      shapesRef.current.push(shape);
-    });
-  }, [config, getPosition, getClipPath]);
+      // Add gradient if needed
+      if (config.useGradient) {
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        const grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+        grad.setAttribute('id', `grad-${index}`);
+        grad.setAttribute('gradientTransform', `rotate(${rotation})`);
+        
+        const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        stop1.setAttribute('offset', '0%');
+        stop1.setAttribute('stop-color', config.gradientStart);
+        
+        const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        stop2.setAttribute('offset', '100%');
+        stop2.setAttribute('stop-color', config.gradientEnd);
+        
+        grad.appendChild(stop1);
+        grad.appendChild(stop2);
+        defs.appendChild(grad);
+        svg.appendChild(defs);
+      }
 
-  // Animation loop
+      let shapeEl;
+      const fill = config.useGradient ? `url(#grad-${index})` : config.fillColor;
+      
+      if (path.type === 'ellipse') {
+        shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+        shapeEl.setAttribute('cx', path.cx);
+        shapeEl.setAttribute('cy', path.cy);
+        shapeEl.setAttribute('rx', path.rx - 0.5);
+        shapeEl.setAttribute('ry', path.ry - 0.5);
+      } else if (path.type === 'rect') {
+        shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        shapeEl.setAttribute('x', 0.5);
+        shapeEl.setAttribute('y', 0.5);
+        shapeEl.setAttribute('width', path.width - 1);
+        shapeEl.setAttribute('height', path.height - 1);
+      } else if (path.type === 'polygon') {
+        shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        shapeEl.setAttribute('points', path.points);
+      }
+
+      shapeEl.setAttribute('stroke', config.borderColor);
+      shapeEl.setAttribute('fill', fill);
+      shapeEl.setAttribute('stroke-width', '1');
+      
+      svg.appendChild(shapeEl);
+      canvas.appendChild(svg);
+      shapesRef.current.push(svg);
+    });
+  }, [config, getPosition]);
+
   useEffect(() => {
     if (isPlaying) {
       animationRef.current = setInterval(() => {
-        setCurrentFrame(prev => {
-          const next = prev + 1;
-          if (next > maxFrames) {
-            return 0; // Loop
-          }
-          return next;
-        });
+        setCurrentFrame(prev => (prev + 1 > maxFrames ? 0 : prev + 1));
       }, config.animationSpeed);
     } else {
       clearInterval(animationRef.current);
     }
-
     return () => clearInterval(animationRef.current);
   }, [isPlaying, maxFrames, config.animationSpeed]);
 
-  // Render on frame change
   useEffect(() => {
     renderShapes(currentFrame);
   }, [currentFrame, renderShapes]);
-
-  // Re-render when config changes (but keep current frame)
-  useEffect(() => {
-    renderShapes(currentFrame);
-  }, [config, currentFrame, renderShapes]);
 
   const handleConfigChange = (key, value) => {
     setConfig(prev => ({ ...prev, [key]: value }));
@@ -284,15 +315,23 @@ const AnimationLab = () => {
         <h2>Animation Lab</h2>
 
         <div className="lab-section">
-          <h3>Shape</h3>
-          <select
-            value={config.shape}
-            onChange={(e) => handleConfigChange('shape', e.target.value)}
-          >
+          <h3>Shape: {selectedShape?.name}</h3>
+          <div className="shape-buttons">
             {SHAPES.map(s => (
-              <option key={s.id} value={s.id}>{s.name}</option>
+              <button
+                key={s.id}
+                className={`shape-btn ${config.shape === s.id ? 'active' : ''}`}
+                onClick={() => handleConfigChange('shape', s.id)}
+                title={s.name}
+              >
+                <ShapePreview 
+                  shapeId={s.id} 
+                  size={24} 
+                  stroke={config.shape === s.id ? '#fff' : '#666'}
+                />
+              </button>
             ))}
-          </select>
+          </div>
 
           <label className="lab-checkbox">
             <input
@@ -468,10 +507,7 @@ const AnimationLab = () => {
         <div className="lab-canvas" ref={canvasRef} />
         
         <div className="lab-controls">
-          <button
-            className="lab-play-btn"
-            onClick={() => setIsPlaying(!isPlaying)}
-          >
+          <button className="lab-play-btn" onClick={() => setIsPlaying(!isPlaying)}>
             {isPlaying ? '⏸' : '▶'}
           </button>
           
@@ -489,12 +525,7 @@ const AnimationLab = () => {
             <span className="lab-frame-count">{currentFrame} / {maxFrames}</span>
           </div>
 
-          <button
-            className="lab-reset-btn"
-            onClick={() => setCurrentFrame(0)}
-          >
-            ⟲
-          </button>
+          <button className="lab-reset-btn" onClick={() => setCurrentFrame(0)}>⟲</button>
         </div>
       </div>
     </div>
