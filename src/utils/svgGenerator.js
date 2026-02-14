@@ -20,10 +20,10 @@ export function generateSquaresInCircle(i, isRotating=false, isExpanding=false, 
         const square = document.createElement('div');
         const centerX = Math.cos(angle * i) * radius + windowWidth / 2 - squareSize / 2;
         
-        // For rectangles (isExpanding): high variance for skinny rectangles
-        // Range: 0.3x to 1.8x base size (15-90px) - creates long skinny and short wide rectangles
-        const expandWidth = isExpanding ? squareSize * (0.3 + Math.random() * 1.5) : squareSize;
-        const expandHeight = isExpanding ? squareSize * (0.3 + Math.random() * 1.5) : squareSize;
+        // For rectangles (isExpanding): variance for skinny rectangles
+        // Range: 0.3x to 1.2x base size (15-60px)
+        const expandWidth = isExpanding ? squareSize * (0.3 + Math.random() * 0.9) : squareSize;
+        const expandHeight = isExpanding ? squareSize * (0.3 + Math.random() * 0.9) : squareSize;
         
         // For diamonds/kites (isDiamond): different width and height for kite/parallelogram shapes
         const diamondWidth = isDiamond ? squareSize * (0.3 + Math.random() * 1.0) : squareSize;
@@ -58,9 +58,9 @@ export function generateSquaresInCircle(i, isRotating=false, isExpanding=false, 
     const squareLeft = document.createElement('div');
     const leftX = Math.cos(angle * i) * radius + 200 - squareSize / 2;
     
-    // For rectangles (isExpanding): high variance for skinny rectangles (15-90px)
-    const leftExpandWidth = isExpanding ? squareSize * (0.3 + Math.random() * 1.5) : squareSize;
-    const leftExpandHeight = isExpanding ? squareSize * (0.3 + Math.random() * 1.5) : squareSize;
+    // For rectangles (isExpanding): variance for skinny rectangles (15-60px)
+    const leftExpandWidth = isExpanding ? squareSize * (0.3 + Math.random() * 0.9) : squareSize;
+    const leftExpandHeight = isExpanding ? squareSize * (0.3 + Math.random() * 0.9) : squareSize;
     
     // For diamonds/kites (isDiamond): different width and height
     const leftDiamondWidth = isDiamond ? squareSize * (0.3 + Math.random() * 1.0) : squareSize;
@@ -91,9 +91,9 @@ export function generateSquaresInCircle(i, isRotating=false, isExpanding=false, 
     const squareRight = document.createElement('div');
     const rightX = windowWidth - 200 - Math.cos(angle * i) * radius - squareSize / 2;
     
-    // For rectangles (isExpanding): high variance for skinny rectangles (15-90px)
-    const rightExpandWidth = isExpanding ? squareSize * (0.3 + Math.random() * 1.5) : squareSize;
-    const rightExpandHeight = isExpanding ? squareSize * (0.3 + Math.random() * 1.5) : squareSize;
+    // For rectangles (isExpanding): variance for skinny rectangles (15-60px)
+    const rightExpandWidth = isExpanding ? squareSize * (0.3 + Math.random() * 0.9) : squareSize;
+    const rightExpandHeight = isExpanding ? squareSize * (0.3 + Math.random() * 0.9) : squareSize;
     
     // For diamonds/kites (isDiamond): different width and height
     const rightDiamondWidth = isDiamond ? squareSize * (0.3 + Math.random() * 1.0) : squareSize;
