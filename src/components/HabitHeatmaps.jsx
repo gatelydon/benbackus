@@ -63,13 +63,17 @@ export const SingleHeatmap = ({ valueKey, shadeKey, unit, color = 'green' }) => 
       <div className="mini-heatmap-grid">
         {weeks.map((week, i) => (
           <div key={i} className="heatmap-week">
-            {week.map((day, j) => (
-              <div
-                key={j}
-                className={`heatmap-cell ${day ? day[shadeKey] : 'future'}`}
-                title={day ? `${day.date}: ${day[valueKey]} ${unit}` : ''}
-              />
-            ))}
+            {week.map((day, j) => {
+              const hasActivity = day && day[valueKey] > 0;
+              const shade = hasActivity ? day[shadeKey] : 'empty';
+              return (
+                <div
+                  key={j}
+                  className={`heatmap-cell ${shade}`}
+                  title={hasActivity ? `${day.date}: ${day[valueKey]} ${unit}` : ''}
+                />
+              );
+            })}
           </div>
         ))}
       </div>
