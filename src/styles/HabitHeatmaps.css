@@ -115,11 +115,28 @@
   transform: none;
 }
 
+/* Single Heatmap (embedded in sections) */
+.single-heatmap {
+  margin-top: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.single-heatmap-stats {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #8b949e;
+  margin-bottom: 0.75rem;
+}
+
 /* Loading */
 .heatmaps-loading {
   text-align: center;
-  padding: 2rem;
+  padding: 1rem;
   color: #8b949e;
+  font-size: 0.85rem;
 }
 
 /* Responsive */

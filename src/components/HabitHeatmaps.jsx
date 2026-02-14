@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import '../styles/HabitHeatmaps.css';
 
 const SUPABASE_URL = 'https://qtdsqfebryixryjudkcp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Ph4txCpe97qV80KH2fkRlw_yV7ZX2Av';
 
-const HabitHeatmaps = () => {
+// Context to share data between heatmaps
+const HabitDataContext = createContext({ data: [], loading: true });
+
+export const HabitDataProvider = ({ children }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,6 +34,75 @@ const HabitHeatmaps = () => {
     }
     setLoading(false);
   };
+
+  return (
+    <HabitDataContext.Provider value={{ data, loading }}>
+      {children}
+    </HabitDataContext.Provider>
+  );
+};
+
+export const useHabitData = () => useContext(HabitDataContext);
+
+// Individual heatmap component for embedding in sections
+export const SingleHeatmap = ({ valueKey, shadeKey, unit }) => {
+  const { data, loading } = useHabitData();
+
+  if (loading) return <div className="heatmaps-loading">Loading activity...</div>;
+  if (!data.length) return null;
+
+  const weeks = groupByWeek(data);
+  const totalDays = data.filter(d => d[valueKey] > 0).length;
+  const totalValue = data.reduce((sum, d) => sum + (d[valueKey] || 0), 0);
+
+  return (
+    <div className="single-heatmap">
+      <div className="single-heatmap-stats">
+        {totalDays} days · {totalValue.toLocaleString()} {unit}
+      </div>
+      <div className="mini-heatmap-grid">
+        {weeks.map((week, i) => (
+          <div key={i} className="heatmap-week">
+            {week.map((day, j) => (
+              <div
+                key={j}
+                className={`heatmap-cell ${day ? day[shadeKey] : 'future'}`}
+                title={day ? `${day.date}: ${day[valueKey]} ${unit}` : ''}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="mini-heatmap-legend">
+        <span>Less</span>
+        <div className="legend-cells">
+          <div className="heatmap-cell empty" />
+          <div className="heatmap-cell light" />
+          <div className="heatmap-cell medium" />
+          <div className="heatmap-cell heavy" />
+        </div>
+        <span>More</span>
+      </div>
+    </div>
+  );
+};
+
+// Shorthand components for each habit
+export const AnkiHeatmap = () => (
+  <SingleHeatmap valueKey="anki_value" shadeKey="anki_shade" unit="cards" />
+);
+
+export const MathHeatmap = () => (
+  <SingleHeatmap valueKey="math_value" shadeKey="math_shade" unit="XP" />
+);
+
+export const ChessHeatmap = () => (
+  <SingleHeatmap valueKey="chess_value" shadeKey="chess_shade" unit="games" />
+);
+
+// Original combined view (still available if needed)
+const HabitHeatmaps = () => {
+  const { data, loading } = useHabitData();
 
   if (loading) return <div className="heatmaps-loading">Loading activity...</div>;
   if (!data.length) return null;
