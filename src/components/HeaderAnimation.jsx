@@ -47,15 +47,20 @@ function HeaderAnimation() {
 
     // Pre-generate all shape data
     const shapeData = [];
+    
+    // On mobile, position higher (35% down) and use smaller radius
+    const mobileRadius = Math.min(CONFIG.arrangementRadius, windowWidth * 0.35);
+    const centerX = isMobile ? windowWidth / 2 : 200 + CONFIG.arrangementRadius;
+    const centerY = isMobile ? windowHeight * 0.35 : windowHeight / 2;
+    const radius = isMobile ? mobileRadius : CONFIG.arrangementRadius;
+    
     for (let i = 0; i < CONFIG.totalShapes; i++) {
       const progress = i / CONFIG.totalShapes;
       const angle = progress * Math.PI * 2;
 
       // Figure-8 arrangement
-      const centerX = isMobile ? windowWidth / 2 : 200 + CONFIG.arrangementRadius;
-      const centerY = windowHeight / 2;
-      const x = centerX + Math.sin(angle) * CONFIG.arrangementRadius;
-      const y = centerY + Math.sin(angle * 2) * CONFIG.arrangementRadius * 0.5;
+      const x = centerX + Math.sin(angle) * radius;
+      const y = centerY + Math.sin(angle * 2) * radius * 0.5;
 
       shapeData.push({
         index: i,
