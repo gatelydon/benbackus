@@ -36,10 +36,26 @@ function HeaderAnimation() {
   const shapesRef = useRef([]);
   const frameRef = useRef(0);
   const animationRef = useRef(null);
+  const wrapperRef = useRef(null);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+
+    // Create a fixed wrapper for all shapes
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    `;
+    document.body.appendChild(wrapper);
+    wrapperRef.current = wrapper;
 
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
@@ -79,13 +95,12 @@ function HeaderAnimation() {
       svg.setAttribute('height', CONFIG.shapeSize);
       svg.setAttribute('viewBox', `0 0 ${CONFIG.shapeSize} ${CONFIG.shapeSize}`);
       svg.style.cssText = `
-        position: fixed;
+        position: absolute;
         left: ${data.x}px;
         top: ${data.y}px;
         transform: rotate(${data.baseRotation}deg);
         transform-origin: top left;
         pointer-events: none;
-        z-index: 0;
         opacity: 0;
       `;
       svg.dataset.index = data.index;
@@ -98,7 +113,7 @@ function HeaderAnimation() {
       polygon.setAttribute('stroke-width', '1');
 
       svg.appendChild(polygon);
-      document.body.appendChild(svg);
+      wrapper.appendChild(svg);
       shapesRef.current.push(svg);
     });
 
@@ -112,13 +127,12 @@ function HeaderAnimation() {
         svg.setAttribute('height', CONFIG.shapeSize);
         svg.setAttribute('viewBox', `0 0 ${CONFIG.shapeSize} ${CONFIG.shapeSize}`);
         svg.style.cssText = `
-          position: fixed;
+          position: absolute;
           left: ${mirrorX - CONFIG.shapeSize / 2}px;
           top: ${data.y}px;
           transform: rotate(${-data.baseRotation}deg);
           transform-origin: top right;
           pointer-events: none;
-          z-index: 0;
           opacity: 0;
         `;
         svg.dataset.index = data.index;
@@ -132,7 +146,7 @@ function HeaderAnimation() {
         polygon.setAttribute('stroke-width', '1');
 
         svg.appendChild(polygon);
-        document.body.appendChild(svg);
+        wrapper.appendChild(svg);
         shapesRef.current.push(svg);
       });
     }
@@ -184,6 +198,10 @@ function HeaderAnimation() {
       clearTimeout(animationRef.current);
       shapesRef.current.forEach(svg => svg.remove());
       shapesRef.current = [];
+      if (wrapperRef.current) {
+        wrapperRef.current.remove();
+        wrapperRef.current = null;
+      }
     };
   }, []);
 
