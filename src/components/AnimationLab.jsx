@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import '../styles/AnimationLab.css';
 
 const SHAPES = [
@@ -40,19 +40,18 @@ const DEFAULT_CONFIG = {
   animationSpeed: 50,
 };
 
-// SVG path generators
-const getShapePath = (shape, w, h, variance = 0) => {
-  const v = variance;
+// SVG path generators - now anchored to top-left (0,0)
+const getShapePath = (shape, w, h) => {
   switch (shape) {
     case 'circle':
       return { type: 'ellipse', cx: w/2, cy: h/2, rx: w/2, ry: h/2 };
     case 'ellipse':
-      return { type: 'ellipse', cx: w/2, cy: h/2, rx: w/2 * (1 + v * 0.3), ry: h/2 * (1 - v * 0.3) };
+      return { type: 'ellipse', cx: w/2, cy: h/2, rx: w/2, ry: h/2 };
     case 'square':
     case 'rectangle':
       return { type: 'rect', x: 0, y: 0, width: w, height: h };
     case 'parallelogram': {
-      const skew = w * (0.2 + v * 0.1);
+      const skew = w * 0.25;
       return { type: 'polygon', points: `${skew},0 ${w},0 ${w-skew},${h} 0,${h}` };
     }
     case 'diamond':
@@ -92,7 +91,7 @@ const createStar = (w, h, points, innerRatio) => {
 
 // Mini shape preview for buttons
 const ShapePreview = ({ shapeId, size = 20, stroke = '#888', fill = 'none' }) => {
-  const path = getShapePath(shapeId, size, size, 0);
+  const path = getShapePath(shapeId, size, size);
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
       {path.type === 'ellipse' && (
@@ -115,18 +114,27 @@ const AnimationLab = () => {
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentFrame, setCurrentFrame] = useState(0);
-  const [maxFrames, setMaxFrames] = useState(DEFAULT_CONFIG.totalShapes);
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
   const canvasRef = useRef(null);
   const shapesRef = useRef([]);
   const animationRef = useRef(null);
 
-  useEffect(() => {
-    setMaxFrames(config.totalShapes);
-    if (currentFrame > config.totalShapes) {
-      setCurrentFrame(config.totalShapes);
-    }
-  }, [config.totalShapes, currentFrame]);
+  const maxFrames = config.totalShapes;
 
+  // Update canvas size on mount and resize
+  useEffect(() => {
+    const updateSize = () => {
+      if (canvasRef.current) {
+        const rect = canvasRef.current.getBoundingClientRect();
+        setCanvasSize({ width: rect.width, height: rect.height });
+      }
+    };
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
+  // Calculate position based on arrangement
   const getPosition = useCallback((index, total, arrangement, radius, centerX, centerY) => {
     const progress = index / total;
     const angle = progress * Math.PI * 2;
@@ -159,66 +167,95 @@ const AnimationLab = () => {
     }
   }, []);
 
-  const renderShapes = useCallback((frameCount) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  // Pre-generate all shape data when config changes (memoized)
+  const shapeData = useMemo(() => {
+    const centerX = canvasSize.width / 2;
+    const centerY = canvasSize.height / 2;
+    const shapeInfo = SHAPES.find(s => s.id === config.shape);
+    const canRandomize = shapeInfo && !shapeInfo.fixedAspect && config.randomDimensions;
 
-    shapesRef.current.forEach(el => el.remove());
-    shapesRef.current = [];
+    const data = [];
+    for (let i = 0; i < config.totalShapes; i++) {
+      const pos = getPosition(
+        i, config.totalShapes, config.arrangement, 
+        config.arrangementRadius, centerX, centerY
+      );
 
-    const rect = canvas.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-
-    const shapesToDraw = [];
-    for (let i = 0; i < frameCount; i++) {
-      const armIndex = i % config.startingPoints;
-      const shapeInArm = Math.floor(i / config.startingPoints);
-      const actualIndex = armIndex * (config.totalShapes / config.startingPoints) + shapeInArm;
-      if (actualIndex < config.totalShapes) {
-        shapesToDraw.push(actualIndex);
-      }
-    }
-
-    shapesToDraw.forEach((index) => {
-      const pos = getPosition(index, config.totalShapes, config.arrangement, config.arrangementRadius, centerX, centerY);
-
+      // Calculate dimensions - random variance anchored to base size
+      // Width and height vary independently, but position stays fixed
       let width = config.shapeSize;
       let height = config.shapeSize;
       
-      const shapeInfo = SHAPES.find(s => s.id === config.shape);
-      const variance = config.randomDimensions && shapeInfo && !shapeInfo.fixedAspect
-        ? (Math.random() - 0.5) * 2 * config.dimensionVariance
-        : 0;
-      
-      if (config.randomDimensions && shapeInfo && !shapeInfo.fixedAspect) {
-        width = config.shapeSize * (1 + (Math.random() - 0.5) * 2 * config.dimensionVariance);
-        height = config.shapeSize * (1 + (Math.random() - 0.5) * 2 * config.dimensionVariance);
+      if (canRandomize) {
+        // Variance applies to how much bigger (not smaller for anchor stability)
+        // Range: baseSize to baseSize * (1 + variance)
+        width = config.shapeSize * (1 + Math.random() * config.dimensionVariance);
+        height = config.shapeSize * (1 + Math.random() * config.dimensionVariance);
       }
 
-      const rotation = config.rotateWithPosition ? (index / config.totalShapes) * 360 : 0;
-      const path = getShapePath(config.shape, width, height, variance);
+      const rotation = config.rotateWithPosition ? (i / config.totalShapes) * 360 : 0;
 
-      // Create SVG element
+      data.push({
+        index: i,
+        pos,
+        width,
+        height,
+        rotation,
+      });
+    }
+
+    return data;
+  }, [config, canvasSize, getPosition]);
+
+  // Calculate draw order based on starting points
+  const drawOrder = useMemo(() => {
+    const order = [];
+    for (let i = 0; i < config.totalShapes; i++) {
+      const armIndex = i % config.startingPoints;
+      const shapeInArm = Math.floor(i / config.startingPoints);
+      const actualIndex = Math.floor(armIndex * (config.totalShapes / config.startingPoints) + shapeInArm);
+      if (actualIndex < config.totalShapes) {
+        order.push(actualIndex);
+      }
+    }
+    return order;
+  }, [config.totalShapes, config.startingPoints]);
+
+  // Render all shapes once when config/canvas changes
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Clear existing
+    shapesRef.current.forEach(el => el.remove());
+    shapesRef.current = [];
+
+    // Create all shapes (hidden initially)
+    shapeData.forEach((data, i) => {
+      const { pos, width, height, rotation } = data;
+      const path = getShapePath(config.shape, width, height);
+
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.setAttribute('width', width);
       svg.setAttribute('height', height);
       svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
       svg.style.cssText = `
         position: absolute;
-        left: ${pos.x - width / 2}px;
-        top: ${pos.y - height / 2}px;
+        left: ${pos.x}px;
+        top: ${pos.y}px;
         transform: rotate(${rotation}deg);
+        transform-origin: top left;
         pointer-events: none;
         overflow: visible;
+        opacity: 0;
       `;
+      svg.dataset.shapeIndex = i;
 
       // Add gradient if needed
       if (config.useGradient) {
         const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
         const grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
-        grad.setAttribute('id', `grad-${index}`);
-        grad.setAttribute('gradientTransform', `rotate(${rotation})`);
+        grad.setAttribute('id', `grad-${i}`);
         
         const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
         stop1.setAttribute('offset', '0%');
@@ -235,20 +272,20 @@ const AnimationLab = () => {
       }
 
       let shapeEl;
-      const fill = config.useGradient ? `url(#grad-${index})` : config.fillColor;
+      const fill = config.useGradient ? `url(#grad-${i})` : config.fillColor;
       
       if (path.type === 'ellipse') {
         shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
         shapeEl.setAttribute('cx', path.cx);
         shapeEl.setAttribute('cy', path.cy);
-        shapeEl.setAttribute('rx', path.rx - 0.5);
-        shapeEl.setAttribute('ry', path.ry - 0.5);
+        shapeEl.setAttribute('rx', Math.max(0, path.rx - 0.5));
+        shapeEl.setAttribute('ry', Math.max(0, path.ry - 0.5));
       } else if (path.type === 'rect') {
         shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         shapeEl.setAttribute('x', 0.5);
         shapeEl.setAttribute('y', 0.5);
-        shapeEl.setAttribute('width', path.width - 1);
-        shapeEl.setAttribute('height', path.height - 1);
+        shapeEl.setAttribute('width', Math.max(0, path.width - 1));
+        shapeEl.setAttribute('height', Math.max(0, path.height - 1));
       } else if (path.type === 'polygon') {
         shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
         shapeEl.setAttribute('points', path.points);
@@ -262,8 +299,19 @@ const AnimationLab = () => {
       canvas.appendChild(svg);
       shapesRef.current.push(svg);
     });
-  }, [config, getPosition]);
+  }, [shapeData, config.shape, config.borderColor, config.fillColor, config.useGradient, config.gradientStart, config.gradientEnd]);
 
+  // Update visibility based on current frame
+  useEffect(() => {
+    const visibleSet = new Set(drawOrder.slice(0, currentFrame));
+    
+    shapesRef.current.forEach((svg) => {
+      const idx = parseInt(svg.dataset.shapeIndex);
+      svg.style.opacity = visibleSet.has(idx) ? '1' : '0';
+    });
+  }, [currentFrame, drawOrder]);
+
+  // Animation loop
   useEffect(() => {
     if (isPlaying) {
       animationRef.current = setInterval(() => {
@@ -274,10 +322,6 @@ const AnimationLab = () => {
     }
     return () => clearInterval(animationRef.current);
   }, [isPlaying, maxFrames, config.animationSpeed]);
-
-  useEffect(() => {
-    renderShapes(currentFrame);
-  }, [currentFrame, renderShapes]);
 
   const handleConfigChange = (key, value) => {
     setConfig(prev => ({ ...prev, [key]: value }));
