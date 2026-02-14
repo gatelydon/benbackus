@@ -7,7 +7,7 @@ function BackgroundAnimation() {
   const lastScrollIndexRef = useRef(0);
 
   const INTERVAL = 300;
-  const STUDY_SHAPES = 220; // Ben's config: 220 diamonds with 7 starting points
+  const STUDY_SHAPES = 300; // Match other sections, 7 starting points for interleaved draw
   
   // Checkpoints - end at CHECKPOINT_NINE so Self-Study shows full animation
   const CHECKPOINT_ONE = INTERVAL;      // End of circle draw (About)

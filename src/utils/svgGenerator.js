@@ -125,15 +125,15 @@ export function generateSquaresInCircle(i, isRotating=false, isExpanding=false, 
     return { left: squareLeft, right: squareRight };
 }
 
-// Study section: Ben's diamond config
-// 220 shapes, 7 starting points, size 100, radius 138, white borders, rotate with position
-export function generateStudyDiamond(frameIndex, startingPoints = 7, totalShapes = 220) {
+// Study section: diamond animation matching existing style
+// Uses same size/radius/color as other animations, but with 7 starting points interleaved draw
+export function generateStudyDiamond(frameIndex, startingPoints = 7, totalShapes = 300) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
-    const shapeSize = 100;
-    const radius = 138;
+    const shapeSize = 50;  // Match existing
+    const radius = 100;    // Match existing
     const isMobile = windowWidth < 768;
-    const borderColor = 'rgba(255, 255, 255, 0.9)';
+    const borderColor = 'rgba(60, 60, 60, 1)';  // Match existing gray
 
     // Calculate which shape index this frame corresponds to (interleaved drawing)
     const armIndex = frameIndex % startingPoints;
@@ -161,12 +161,11 @@ export function generateStudyDiamond(frameIndex, startingPoints = 7, totalShapes
             width: ${shapeSize}px;
             height: ${shapeSize}px;
             border: 1px solid ${borderColor};
-            background-color: transparent;
+            background-color: #1c1c1c;
             touch-action: none;
             z-index: 0;
             pointer-events: none;
             transform: rotate(${rotation}deg);
-            transform-origin: top left;
         `);
         square.setAttribute('class', 'square');
         document.body.appendChild(square);
@@ -174,7 +173,7 @@ export function generateStudyDiamond(frameIndex, startingPoints = 7, totalShapes
         return { left: square, right: null, actualIndex };
     }
 
-    // Desktop: Left side
+    // Desktop: Left side - match existing positioning (200px from edge)
     const squareLeft = document.createElement('div');
     const leftX = Math.cos(angleRad) * radius + 200 - shapeSize / 2;
 
@@ -185,16 +184,15 @@ export function generateStudyDiamond(frameIndex, startingPoints = 7, totalShapes
         width: ${shapeSize}px;
         height: ${shapeSize}px;
         border: 1px solid ${borderColor};
-        background-color: transparent;
+        background-color: #1c1c1c;
         touch-action: none;
         z-index: 0;
         pointer-events: none;
         transform: rotate(${rotation}deg);
-        transform-origin: top left;
     `);
     squareLeft.setAttribute('class', 'square');
 
-    // Desktop: Right side (mirrored)
+    // Desktop: Right side (mirrored) - match existing positioning
     const squareRight = document.createElement('div');
     const rightX = windowWidth - 200 - Math.cos(angleRad) * radius - shapeSize / 2;
 
@@ -205,12 +203,11 @@ export function generateStudyDiamond(frameIndex, startingPoints = 7, totalShapes
         width: ${shapeSize}px;
         height: ${shapeSize}px;
         border: 1px solid ${borderColor};
-        background-color: transparent;
+        background-color: #1c1c1c;
         touch-action: none;
         z-index: 0;
         pointer-events: none;
         transform: rotate(${-rotation}deg);
-        transform-origin: top right;
     `);
     squareRight.setAttribute('class', 'square');
 
