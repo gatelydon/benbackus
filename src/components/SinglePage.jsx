@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "./Navbar";
 import BackgroundAnimation from "./BackgroundAnimation";
+import HeaderAnimation from "./HeaderAnimation";
 import AboutSection from "./sections/AboutSection";
 import CodingSection from "./sections/CodingSection";
 import ArtSection from "./sections/ArtSection";
@@ -12,6 +13,7 @@ function SinglePage() {
   return (
     <div className="single-page-container">
       <BackgroundAnimation />
+      <HeaderAnimation />
       <Navbar />
       <div className="sections-wrapper">
         <section id="hero" className="hero-section">
