@@ -45,7 +45,7 @@ export const HabitDataProvider = ({ children }) => {
 export const useHabitData = () => useContext(HabitDataContext);
 
 // Individual heatmap component for embedding in sections
-export const SingleHeatmap = ({ valueKey, shadeKey, unit }) => {
+export const SingleHeatmap = ({ valueKey, shadeKey, unit, color = 'green' }) => {
   const { data, loading } = useHabitData();
 
   if (loading) return <div className="heatmaps-loading">Loading activity...</div>;
@@ -56,7 +56,7 @@ export const SingleHeatmap = ({ valueKey, shadeKey, unit }) => {
   const totalValue = data.reduce((sum, d) => sum + (d[valueKey] || 0), 0);
 
   return (
-    <div className="single-heatmap">
+    <div className={`single-heatmap heatmap-${color}`}>
       <div className="single-heatmap-stats">
         {totalDays} days · {totalValue.toLocaleString()} {unit}
       </div>
@@ -89,15 +89,15 @@ export const SingleHeatmap = ({ valueKey, shadeKey, unit }) => {
 
 // Shorthand components for each habit
 export const AnkiHeatmap = () => (
-  <SingleHeatmap valueKey="anki_value" shadeKey="anki_shade" unit="cards" />
+  <SingleHeatmap valueKey="anki_value" shadeKey="anki_shade" unit="cards" color="white" />
 );
 
 export const MathHeatmap = () => (
-  <SingleHeatmap valueKey="math_value" shadeKey="math_shade" unit="XP" />
+  <SingleHeatmap valueKey="math_value" shadeKey="math_shade" unit="XP" color="blue" />
 );
 
 export const ChessHeatmap = () => (
-  <SingleHeatmap valueKey="chess_value" shadeKey="chess_shade" unit="games" />
+  <SingleHeatmap valueKey="chess_value" shadeKey="chess_shade" unit="games" color="green" />
 );
 
 // Original combined view (still available if needed)

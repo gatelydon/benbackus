@@ -70,7 +70,7 @@
   transform: scale(1.3);
 }
 
-/* Colors */
+/* Colors - Default (green) */
 .heatmap-cell.empty {
   background-color: rgba(255, 255, 255, 0.08);
 }
@@ -89,6 +89,39 @@
 
 .heatmap-cell.future {
   background-color: transparent;
+}
+
+/* Green (Chess) */
+.heatmap-green .heatmap-cell.light {
+  background-color: #0e4429;
+}
+.heatmap-green .heatmap-cell.medium {
+  background-color: #006d32;
+}
+.heatmap-green .heatmap-cell.heavy {
+  background-color: #26a641;
+}
+
+/* Blue (Math) */
+.heatmap-blue .heatmap-cell.light {
+  background-color: #0d3868;
+}
+.heatmap-blue .heatmap-cell.medium {
+  background-color: #1158a8;
+}
+.heatmap-blue .heatmap-cell.heavy {
+  background-color: #2f81f7;
+}
+
+/* White (Anki) */
+.heatmap-white .heatmap-cell.light {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.heatmap-white .heatmap-cell.medium {
+  background-color: rgba(255, 255, 255, 0.45);
+}
+.heatmap-white .heatmap-cell.heavy {
+  background-color: rgba(255, 255, 255, 0.75);
 }
 
 /* Legend */
