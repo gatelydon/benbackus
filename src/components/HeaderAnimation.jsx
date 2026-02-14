@@ -99,7 +99,7 @@ function HeaderAnimation() {
         left: ${data.x}px;
         top: ${data.y}px;
         transform: rotate(${data.baseRotation}deg);
-        transform-origin: top left;
+        transform-origin: center center;
         pointer-events: none;
         opacity: 0;
       `;
@@ -131,7 +131,7 @@ function HeaderAnimation() {
           left: ${mirrorX - CONFIG.shapeSize / 2}px;
           top: ${data.y}px;
           transform: rotate(${-data.baseRotation}deg);
-          transform-origin: top right;
+          transform-origin: center center;
           pointer-events: none;
           opacity: 0;
         `;
