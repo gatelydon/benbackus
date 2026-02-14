@@ -1,11 +1,13 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { generateSquaresInCircle } from '../utils/svgGenerator';
+import { generateSquaresInCircle, generateStudyDiamond } from '../utils/svgGenerator';
 
 function BackgroundAnimation() {
   const squaresRef = useRef([]);
+  const studyShapesRef = useRef([]);
   const lastScrollIndexRef = useRef(0);
 
   const INTERVAL = 300;
+  const STUDY_SHAPES = 220; // Ben's config: 220 diamonds with 7 starting points
   
   // Checkpoints - end at CHECKPOINT_NINE so Self-Study shows full animation
   const CHECKPOINT_ONE = INTERVAL;      // End of circle draw (About)
@@ -15,9 +17,9 @@ function BackgroundAnimation() {
   const CHECKPOINT_FIVE = INTERVAL * 5;  // End of fractal draw (Art)
   const CHECKPOINT_SIX = INTERVAL * 6;   // End of fractal hide / start matrix
   const CHECKPOINT_SEVEN = INTERVAL * 7; // End of matrix draw (Writing)
-  const CHECKPOINT_EIGHT = INTERVAL * 8; // End of matrix hide / start hexagons
-  const CHECKPOINT_NINE = INTERVAL * 9;  // End of hexagon draw (Self-Study) - STOP HERE
-  const FINISH_LINE = CHECKPOINT_NINE;   // End with hexagons fully visible
+  const CHECKPOINT_EIGHT = INTERVAL * 8; // End of matrix hide / start study diamonds
+  const CHECKPOINT_NINE = CHECKPOINT_EIGHT + STUDY_SHAPES; // End of study diamond draw
+  const FINISH_LINE = CHECKPOINT_NINE;
 
   // Helper to set opacity on both left and right shapes (right may be null on mobile)
   const setShapeOpacity = (shape, opacity) => {
@@ -85,13 +87,11 @@ function BackgroundAnimation() {
       offsetIndex = index - CHECKPOINT_FOUR;
       setShapeOpacity(squares[offsetIndex], 0);
     } else if (index >= CHECKPOINT_EIGHT && index < CHECKPOINT_NINE) {
-      // Drawing spinning diamonds with random dimensions (Self-Study)
-      offsetIndex = index - CHECKPOINT_FOUR;
-      if (offsetIndex >= squares.length) {
-        newSquare = generateSquaresInCircle(offsetIndex - INTERVAL * 4, false, false, false, true, false, true);
-        return [...squares, newSquare];
-      } else {
-        setShapeOpacity(squares[offsetIndex], 1);
+      // Drawing study diamonds (Ben's config: white, 7 starting points, no random)
+      const frameIndex = index - CHECKPOINT_EIGHT;
+      const result = generateStudyDiamond(frameIndex, 7, STUDY_SHAPES);
+      if (result) {
+        studyShapesRef.current.push(result);
       }
     }
     
@@ -131,9 +131,12 @@ function BackgroundAnimation() {
       const offsetIndex = index - CHECKPOINT_FOUR - 1;
       setShapeOpacity(squares[offsetIndex], 1);
     } else if (index >= CHECKPOINT_EIGHT && index <= CHECKPOINT_NINE) {
-      // Reverse hexagon drawing
-      const offsetIndex = index - CHECKPOINT_FOUR - 1;
-      setShapeOpacity(squares[offsetIndex], 0);
+      // Reverse study diamond drawing - remove the last one
+      const shape = studyShapesRef.current.pop();
+      if (shape) {
+        if (shape.left) shape.left.remove();
+        if (shape.right) shape.right.remove();
+      }
     }
     
     return squares;
@@ -184,9 +187,9 @@ function BackgroundAnimation() {
         const sectionProgress = (scrollY - writingTop) / (selfStudyTop - writingTop);
         targetIndex = CHECKPOINT_SIX + Math.floor(sectionProgress * (CHECKPOINT_EIGHT - CHECKPOINT_SIX));
       } else {
-        // In Self-Study section - draw diamonds
+        // In Self-Study section - draw study diamonds
         const sectionProgress = Math.min((scrollY - selfStudyTop) / (docEnd - selfStudyTop), 1);
-        targetIndex = CHECKPOINT_EIGHT + Math.floor(sectionProgress * (FINISH_LINE - CHECKPOINT_EIGHT));
+        targetIndex = CHECKPOINT_EIGHT + Math.floor(sectionProgress * STUDY_SHAPES);
       }
       
       const currentIndex = lastScrollIndexRef.current;
@@ -210,6 +213,7 @@ function BackgroundAnimation() {
 
     // Initialize with nothing visible - animation starts on scroll
     squaresRef.current = [];
+    studyShapesRef.current = [];
     lastScrollIndexRef.current = 0;
 
     window.addEventListener('scroll', handleScroll, { passive: true });
