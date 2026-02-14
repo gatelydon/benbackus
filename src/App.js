@@ -1,7 +1,6 @@
 import React from "react";
 import SinglePage from './components/SinglePage';
-import Habits from './components/Habits';
-import Navbar from './components/Navbar';
+import AnimationLab from './components/AnimationLab';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -14,7 +13,7 @@ function App() {
           <Route path="/coding" element={<SinglePage/>} />
           <Route path="/art" element={<SinglePage/>} />
           <Route path="/writing" element={<SinglePage/>} />
-          <Route path="/habits" element={<><Navbar/><Habits/></>} />
+          <Route path="/animation-lab" element={<AnimationLab/>} />
         </Routes>
       </Router>
     </main>
