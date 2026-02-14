@@ -127,7 +127,8 @@ const AnimationLab = () => {
   const shapesRef = useRef([]);
   const animationRef = useRef(null);
 
-  const maxFrames = config.totalShapes;
+  // Full animation: draw all shapes, then hide all shapes (double the frames)
+  const maxFrames = config.totalShapes * 2;
 
   // Update canvas size on mount and resize
   useEffect(() => {
@@ -354,14 +355,27 @@ const AnimationLab = () => {
   }, [shapeData, config.shape, config.borderColor, config.fillColor, config.useGradient, config.gradientStart, config.gradientEnd]);
 
   // Update visibility based on current frame
+  // First half: draw shapes in order
+  // Second half: hide shapes in same order (shuffle out)
   useEffect(() => {
-    const visibleSet = new Set(drawOrder.slice(0, currentFrame));
+    const totalShapes = config.totalShapes;
+    let visibleSet;
+    
+    if (currentFrame <= totalShapes) {
+      // Draw phase: show shapes 0 to currentFrame
+      visibleSet = new Set(drawOrder.slice(0, currentFrame));
+    } else {
+      // Hide phase: hide shapes in the order they were drawn
+      const hideCount = currentFrame - totalShapes;
+      // Show all shapes except the first hideCount that were drawn
+      visibleSet = new Set(drawOrder.slice(hideCount, totalShapes));
+    }
     
     shapesRef.current.forEach((svg) => {
       const idx = parseInt(svg.dataset.shapeIndex);
       svg.style.opacity = visibleSet.has(idx) ? '1' : '0';
     });
-  }, [currentFrame, drawOrder]);
+  }, [currentFrame, drawOrder, config.totalShapes]);
 
   // Animation loop
   useEffect(() => {
