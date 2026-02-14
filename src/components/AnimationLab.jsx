@@ -45,6 +45,8 @@ const DEFAULT_CONFIG = {
   gradientStart: '#ffffff',
   gradientEnd: '#888888',
   rotateWithPosition: true,
+  animatedRotation: false,
+  rotationSpeed: 2,
   animationSpeed: 50,
 };
 
@@ -303,6 +305,7 @@ const AnimationLab = () => {
         opacity: 0;
       `;
       svg.dataset.shapeIndex = i;
+      svg.dataset.baseRotation = rotation;
 
       // Add gradient if needed
       if (config.useGradient) {
@@ -354,7 +357,7 @@ const AnimationLab = () => {
     });
   }, [shapeData, config.shape, config.borderColor, config.fillColor, config.useGradient, config.gradientStart, config.gradientEnd]);
 
-  // Update visibility based on current frame
+  // Update visibility and rotation based on current frame
   // First half: draw shapes in order
   // Second half: hide shapes in same order (shuffle out)
   useEffect(() => {
@@ -373,9 +376,17 @@ const AnimationLab = () => {
     
     shapesRef.current.forEach((svg) => {
       const idx = parseInt(svg.dataset.shapeIndex);
-      svg.style.opacity = visibleSet.has(idx) ? '1' : '0';
+      const isVisible = visibleSet.has(idx);
+      svg.style.opacity = isVisible ? '1' : '0';
+      
+      // Apply animated rotation if enabled
+      if (config.animatedRotation && isVisible) {
+        const baseRotation = parseFloat(svg.dataset.baseRotation || 0);
+        const animatedAngle = baseRotation + (currentFrame * config.rotationSpeed);
+        svg.style.transform = `rotate(${animatedAngle}deg)`;
+      }
     });
-  }, [currentFrame, drawOrder, config.totalShapes]);
+  }, [currentFrame, drawOrder, config.totalShapes, config.animatedRotation, config.rotationSpeed]);
 
   // Animation loop
   useEffect(() => {
@@ -640,6 +651,29 @@ const AnimationLab = () => {
               onChange={(e) => handleConfigChange('animationSpeed', parseInt(e.target.value))}
             />
           </div>
+
+          <label className="lab-checkbox">
+            <input
+              type="checkbox"
+              checked={config.animatedRotation}
+              onChange={(e) => handleConfigChange('animatedRotation', e.target.checked)}
+            />
+            Spin shapes
+          </label>
+
+          {config.animatedRotation && (
+            <div className="lab-slider">
+              <label>Spin speed: {config.rotationSpeed}°</label>
+              <input
+                type="range"
+                min="0.5"
+                max="10"
+                step="0.5"
+                value={config.rotationSpeed}
+                onChange={(e) => handleConfigChange('rotationSpeed', parseFloat(e.target.value))}
+              />
+            </div>
+          )}
         </div>
 
         <div className="lab-section lab-actions">
