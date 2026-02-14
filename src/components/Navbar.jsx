@@ -29,12 +29,10 @@ function Navbar() {
                 <a className="nav-link" href="#art" onClick={(e) => scrollToSection(e, 'art')}>Art</a>
                 <a className="nav-link" href="#writing" onClick={(e) => scrollToSection(e, 'writing')}>Writing</a>
                 <a className="nav-link" href="#study" onClick={(e) => scrollToSection(e, 'study')}>Study</a>
-                <Link className="nav-link" to="/habits">Habits</Link>
               </>
             ) : (
               <>
                 <Link className="nav-link" to="/">Home</Link>
-                <Link className="nav-link" to="/habits">Habits</Link>
               </>
             )}
         </div>
