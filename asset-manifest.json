@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/benbackus/static/css/main.99570af2.css",
-    "main.js": "/benbackus/static/js/main.322aacd9.js",
+    "main.css": "/benbackus/static/css/main.7c399063.css",
+    "main.js": "/benbackus/static/js/main.900ec59b.js",
     "static/media/waste_sensor.png": "/benbackus/static/media/waste_sensor.25ffe459d77237b4a58f.png",
     "static/media/time.jpg": "/benbackus/static/media/time.3187adaa1221a6fd19a2.jpg",
     "static/media/into_the_vanity.jpg": "/benbackus/static/media/into_the_vanity.b56563bda2464aa2f2a5.jpg",
@@ -18,11 +18,11 @@
     "static/media/Backus_Resume_2024.pdf": "/benbackus/static/media/Backus_Resume_2024.eca239a983b4134a119b.pdf",
     "static/media/Metaphysics_complex_present_paper.pdf": "/benbackus/static/media/Metaphysics_complex_present_paper.baaae8177f6f98f61533.pdf",
     "index.html": "/benbackus/index.html",
-    "main.99570af2.css.map": "/benbackus/static/css/main.99570af2.css.map",
-    "main.322aacd9.js.map": "/benbackus/static/js/main.322aacd9.js.map"
+    "main.7c399063.css.map": "/benbackus/static/css/main.7c399063.css.map",
+    "main.900ec59b.js.map": "/benbackus/static/js/main.900ec59b.js.map"
   },
   "entrypoints": [
-    "static/css/main.99570af2.css",
-    "static/js/main.322aacd9.js"
+    "static/css/main.7c399063.css",
+    "static/js/main.900ec59b.js"
   ]
 }
