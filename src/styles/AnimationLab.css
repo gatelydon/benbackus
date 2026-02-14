@@ -108,6 +108,26 @@ html, body, #root, .App {
   border-color: #888;
 }
 
+.lab-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.lab-row > label {
+  font-size: 0.8rem;
+  color: #aaa;
+  min-width: 50px;
+}
+
+.lab-select-small {
+  flex: 1;
+  padding: 0.3rem;
+  font-size: 0.8rem;
+  margin-bottom: 0;
+}
+
 .lab-checkbox {
   display: flex;
   align-items: center;

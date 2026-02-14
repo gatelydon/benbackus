@@ -22,9 +22,17 @@ const ARRANGEMENTS = [
   { id: 'spiral', name: 'Spiral' },
 ];
 
+const ANCHORS = [
+  { id: 'top-left', name: 'Top-Left' },
+  { id: 'top-right', name: 'Top-Right' },
+  { id: 'center', name: 'Center' },
+  { id: 'tangent', name: 'Follow Circle' },
+];
+
 const DEFAULT_CONFIG = {
   shape: 'square',
   arrangement: 'circle',
+  anchor: 'top-left',
   startingPoints: 6,
   totalShapes: 342,
   shapeSize: 50,
@@ -176,31 +184,67 @@ const AnimationLab = () => {
 
     const data = [];
     for (let i = 0; i < config.totalShapes; i++) {
+      const progress = i / config.totalShapes;
+      const angle = progress * Math.PI * 2; // radians
+      
       const pos = getPosition(
         i, config.totalShapes, config.arrangement, 
         config.arrangementRadius, centerX, centerY
       );
 
       // Calculate dimensions - random variance anchored to base size
-      // Width and height vary independently, but position stays fixed
       let width = config.shapeSize;
       let height = config.shapeSize;
       
       if (canRandomize) {
-        // Variance applies to how much bigger (not smaller for anchor stability)
-        // Range: baseSize to baseSize * (1 + variance)
         width = config.shapeSize * (1 + Math.random() * config.dimensionVariance);
         height = config.shapeSize * (1 + Math.random() * config.dimensionVariance);
       }
 
-      const rotation = config.rotateWithPosition ? (i / config.totalShapes) * 360 : 0;
+      // Calculate rotation based on anchor type
+      let rotation = 0;
+      if (config.anchor === 'tangent') {
+        // Follow the circle - rotate to be tangent to the path
+        rotation = (angle * 180 / Math.PI) + 90; // perpendicular to radius
+      } else if (config.rotateWithPosition) {
+        rotation = (i / config.totalShapes) * 360;
+      }
+
+      // Calculate position offset based on anchor
+      let offsetX = 0;
+      let offsetY = 0;
+      switch (config.anchor) {
+        case 'top-left':
+          // Position is where top-left corner goes (no offset needed)
+          offsetX = 0;
+          offsetY = 0;
+          break;
+        case 'top-right':
+          // Position is where top-right corner goes
+          offsetX = -width;
+          offsetY = 0;
+          break;
+        case 'center':
+          // Position is center of shape
+          offsetX = -width / 2;
+          offsetY = -height / 2;
+          break;
+        case 'tangent':
+          // Center on the path, rotated to follow it
+          offsetX = -width / 2;
+          offsetY = -height / 2;
+          break;
+        default:
+          break;
+      }
 
       data.push({
         index: i,
-        pos,
+        pos: { x: pos.x + offsetX, y: pos.y + offsetY },
         width,
         height,
         rotation,
+        anchor: config.anchor,
       });
     }
 
@@ -232,8 +276,16 @@ const AnimationLab = () => {
 
     // Create all shapes (hidden initially)
     shapeData.forEach((data, i) => {
-      const { pos, width, height, rotation } = data;
+      const { pos, width, height, rotation, anchor } = data;
       const path = getShapePath(config.shape, width, height);
+
+      // Determine transform-origin based on anchor
+      let transformOrigin = 'top left';
+      if (anchor === 'top-right') {
+        transformOrigin = 'top right';
+      } else if (anchor === 'center' || anchor === 'tangent') {
+        transformOrigin = 'center';
+      }
 
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.setAttribute('width', width);
@@ -244,7 +296,7 @@ const AnimationLab = () => {
         left: ${pos.x}px;
         top: ${pos.y}px;
         transform: rotate(${rotation}deg);
-        transform-origin: top left;
+        transform-origin: ${transformOrigin};
         pointer-events: none;
         overflow: visible;
         opacity: 0;
@@ -423,6 +475,19 @@ const AnimationLab = () => {
               <option key={a.id} value={a.id}>{a.name}</option>
             ))}
           </select>
+
+          <div className="lab-row">
+            <label>Anchor:</label>
+            <select
+              value={config.anchor}
+              onChange={(e) => handleConfigChange('anchor', e.target.value)}
+              className="lab-select-small"
+            >
+              {ANCHORS.map(a => (
+                <option key={a.id} value={a.id}>{a.name}</option>
+              ))}
+            </select>
+          </div>
 
           <div className="lab-slider">
             <label>Radius: {config.arrangementRadius}px</label>
