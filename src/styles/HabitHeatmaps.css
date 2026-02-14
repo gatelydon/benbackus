@@ -1,0 +1,140 @@
+.habit-heatmaps {
+  margin-top: 3rem;
+  padding: 2rem 0;
+}
+
+.heatmaps-subtitle {
+  text-align: center;
+  color: #8b949e;
+  margin-bottom: 2rem;
+}
+
+.heatmaps-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Mini Heatmap */
+.mini-heatmap {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mini-heatmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mini-heatmap-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #c9d1d9;
+}
+
+.mini-heatmap-stats {
+  font-size: 0.8rem;
+  color: #8b949e;
+}
+
+.mini-heatmap-grid {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.heatmap-week {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.heatmap-cell {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.3);
+}
+
+/* Colors */
+.heatmap-cell.empty {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.heatmap-cell.light {
+  background-color: #0e4429;
+}
+
+.heatmap-cell.medium {
+  background-color: #006d32;
+}
+
+.heatmap-cell.heavy {
+  background-color: #26a641;
+}
+
+.heatmap-cell.future {
+  background-color: transparent;
+}
+
+/* Legend */
+.mini-heatmap-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 0.5rem;
+  font-size: 10px;
+  color: #8b949e;
+}
+
+.legend-cells {
+  display: flex;
+  gap: 2px;
+}
+
+.legend-cells .heatmap-cell {
+  cursor: default;
+}
+
+.legend-cells .heatmap-cell:hover {
+  transform: none;
+}
+
+/* Loading */
+.heatmaps-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #8b949e;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .mini-heatmap {
+    padding: 1rem;
+  }
+  
+  .heatmap-cell {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .mini-heatmap-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

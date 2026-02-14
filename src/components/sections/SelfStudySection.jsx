@@ -1,10 +1,13 @@
 import React from "react";
 import '../../styles/SelfStudy.css';
+import HabitHeatmaps from '../HabitHeatmaps';
 
 function SelfStudySection() {
   return (
     <div className="selfStudyPage">
       <div className="section-title">Study</div>
+      
+      <HabitHeatmaps />
 
       <div className="study-intro">
         <p>
