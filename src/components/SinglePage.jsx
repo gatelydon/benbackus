@@ -7,6 +7,7 @@ import CodingSection from "./sections/CodingSection";
 import ArtSection from "./sections/ArtSection";
 import WritingSection from "./sections/WritingSection";
 import SelfStudySection from "./sections/SelfStudySection";
+import StatsSection from "./StatsSection";
 import '../styles/SinglePage.css';
 
 function SinglePage() {
@@ -19,6 +20,7 @@ function SinglePage() {
         <section id="hero" className="hero-section">
           <h1 className="hero-name">Ben Backus</h1>
           <p className="hero-tagline">Code · Art · Writing</p>
+          <StatsSection />
         </section>
         <section id="about" className="page-section">
           <AboutSection />
