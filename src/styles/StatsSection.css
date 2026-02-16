@@ -1,7 +1,7 @@
 .stats-section {
-  padding: 2rem 1rem;
+  padding: 3rem 1rem;
   max-width: 900px;
-  margin: 0 auto;
+  margin: 4rem auto;
 }
 
 .stats-loading {
@@ -70,11 +70,6 @@
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
-}
-
-.stat-icon {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
 }
 
 .stat-value {

@@ -20,6 +20,8 @@ function SinglePage() {
         <section id="hero" className="hero-section">
           <h1 className="hero-name">Ben Backus</h1>
           <p className="hero-tagline">Code · Art · Writing</p>
+        </section>
+        <section id="stats" className="stats-wrapper">
           <StatsSection />
         </section>
         <section id="about" className="page-section">

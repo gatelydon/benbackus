@@ -110,7 +110,6 @@ function StatsSection() {
       
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon">🎴</div>
           <div className="stat-value">
             {formatNumber(getDisplayValue(stats.anki.total, stats.anki.days))}
           </div>
@@ -120,7 +119,6 @@ function StatsSection() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon">📐</div>
           <div className="stat-value">
             {formatNumber(getDisplayValue(stats.math.total, stats.math.days))}
           </div>
@@ -130,7 +128,6 @@ function StatsSection() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon">♟️</div>
           <div className="stat-value">
             {stats.chess.rating || '—'}
           </div>
@@ -140,7 +137,6 @@ function StatsSection() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon">🤖</div>
           <div className="stat-value">
             {formatNumber(getDisplayValue(CLAUDE_TOKENS.total, CLAUDE_TOKENS.days))}
           </div>

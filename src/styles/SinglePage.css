@@ -51,7 +51,15 @@
   text-align: center;
 }
 
+/* Stats section wrapper */
+.stats-wrapper {
+  padding: 40px 20px 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Ensure sections have proper spacing */
-#hero, #about, #coding, #art, #writing, #study {
+#hero, #about, #coding, #art, #writing, #study, #stats {
   scroll-margin-top: 60px; /* Account for fixed navbar when jumping to sections */
 }
