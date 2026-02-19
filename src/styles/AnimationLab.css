@@ -269,6 +269,28 @@ html, body, #root, .App {
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
+  position: relative;
+}
+
+.lab-home-link {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  color: #888;
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(20, 20, 20, 0.8);
+  border: 1px solid #333;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.lab-home-link:hover {
+  color: #fff;
+  border-color: #666;
+  background: rgba(40, 40, 40, 0.9);
 }
 
 .lab-canvas {

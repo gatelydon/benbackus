@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import '../styles/AnimationLab.css';
 
 const SHAPES = [
@@ -938,6 +939,7 @@ const AnimationLab = () => {
       </div>
 
       <div className="lab-main">
+        <Link to="/" className="lab-home-link">← Home</Link>
         <div className="lab-canvas" ref={canvasRef} />
         
         <div className="lab-controls">
