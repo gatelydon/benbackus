@@ -162,40 +162,117 @@ function HeaderAnimation() {
       }
     }
 
-    const maxFrames = CONFIG.totalShapes * 2; // Draw + hide
+    // Animation phases:
+    // 1. PHASE_IN: Fast draw with easing (shapes appear)
+    // 2. HOLD: Stay visible for 10 seconds
+    // 3. PHASE_OUT: Fast hide (shapes disappear)
+    // 4. WAIT: Nothing visible for 5 seconds
+    const PHASE_IN = 0;
+    const HOLD = 1;
+    const PHASE_OUT = 2;
+    const WAIT = 3;
+    
+    const HOLD_DURATION = 10000; // 10 seconds
+    const WAIT_DURATION = 5000;  // 5 seconds
+    const FAST_SPEED = 8;        // Fast animation (8ms per frame)
+    
+    let phase = PHASE_IN;
+    let holdTimer = null;
+    let rotationFrame = 0; // Separate counter for continuous rotation
+
+    // Easing function (ease-in-out cubic)
+    const easeInOutCubic = (t) => {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    };
 
     // Animation loop
     const animate = () => {
-      frameRef.current = (frameRef.current + 1) % maxFrames;
-      const frame = frameRef.current;
+      rotationFrame++; // Always increment for smooth rotation
+      
+      if (phase === PHASE_IN) {
+        // Fast phase in with easing
+        frameRef.current++;
+        const progress = frameRef.current / CONFIG.totalShapes;
+        const easedProgress = easeInOutCubic(progress);
+        const visibleCount = Math.floor(easedProgress * CONFIG.totalShapes);
+        const visibleSet = new Set(drawOrder.slice(0, visibleCount));
 
-      let visibleSet;
-      if (frame <= CONFIG.totalShapes) {
-        visibleSet = new Set(drawOrder.slice(0, frame));
-      } else {
-        const hideCount = frame - CONFIG.totalShapes;
-        visibleSet = new Set(drawOrder.slice(hideCount, CONFIG.totalShapes));
-      }
+        shapesRef.current.forEach((svg) => {
+          const idx = parseInt(svg.dataset.index);
+          const isVisible = visibleSet.has(idx);
+          svg.style.opacity = isVisible ? '1' : '0';
 
-      shapesRef.current.forEach((svg) => {
-        const idx = parseInt(svg.dataset.index);
-        const isVisible = visibleSet.has(idx);
-        svg.style.opacity = isVisible ? '1' : '0';
+          if (CONFIG.animatedRotation && isVisible) {
+            const baseRotation = parseFloat(svg.dataset.baseRotation || 0);
+            const animatedAngle = baseRotation + (rotationFrame * CONFIG.rotationSpeed);
+            svg.style.transform = `rotate(${animatedAngle}deg)`;
+          }
+        });
 
-        if (CONFIG.animatedRotation && isVisible) {
-          const baseRotation = parseFloat(svg.dataset.baseRotation || 0);
-          const animatedAngle = baseRotation + (frame * CONFIG.rotationSpeed);
-          svg.style.transform = `rotate(${animatedAngle}deg)`;
+        if (frameRef.current >= CONFIG.totalShapes) {
+          // Done phasing in, start hold
+          phase = HOLD;
+          holdTimer = setTimeout(() => {
+            phase = PHASE_OUT;
+            frameRef.current = 0;
+            animate();
+          }, HOLD_DURATION);
+          // Keep rotation going during hold
+          const rotateInHold = () => {
+            if (phase !== HOLD) return;
+            rotationFrame++;
+            shapesRef.current.forEach((svg) => {
+              if (svg.style.opacity === '1' && CONFIG.animatedRotation) {
+                const baseRotation = parseFloat(svg.dataset.baseRotation || 0);
+                const animatedAngle = baseRotation + (rotationFrame * CONFIG.rotationSpeed);
+                svg.style.transform = `rotate(${animatedAngle}deg)`;
+              }
+            });
+            animationRef.current = setTimeout(rotateInHold, CONFIG.animationSpeed);
+          };
+          rotateInHold();
+          return;
         }
-      });
+        animationRef.current = setTimeout(animate, FAST_SPEED);
+        
+      } else if (phase === PHASE_OUT) {
+        // Fast phase out
+        frameRef.current++;
+        const hideCount = frameRef.current;
+        const visibleSet = new Set(drawOrder.slice(hideCount, CONFIG.totalShapes));
 
-      animationRef.current = setTimeout(animate, CONFIG.animationSpeed);
+        shapesRef.current.forEach((svg) => {
+          const idx = parseInt(svg.dataset.index);
+          const isVisible = visibleSet.has(idx);
+          svg.style.opacity = isVisible ? '1' : '0';
+
+          if (CONFIG.animatedRotation && isVisible) {
+            const baseRotation = parseFloat(svg.dataset.baseRotation || 0);
+            const animatedAngle = baseRotation + (rotationFrame * CONFIG.rotationSpeed);
+            svg.style.transform = `rotate(${animatedAngle}deg)`;
+          }
+        });
+
+        if (frameRef.current >= CONFIG.totalShapes) {
+          // Done phasing out, start wait
+          phase = WAIT;
+          setTimeout(() => {
+            phase = PHASE_IN;
+            frameRef.current = 0;
+            animate();
+          }, WAIT_DURATION);
+          return;
+        }
+        animationRef.current = setTimeout(animate, FAST_SPEED);
+        
+      }
     };
 
     animate();
 
     return () => {
       clearTimeout(animationRef.current);
+      clearTimeout(holdTimer);
       shapesRef.current.forEach(svg => svg.remove());
       shapesRef.current = [];
       if (wrapperRef.current) {
