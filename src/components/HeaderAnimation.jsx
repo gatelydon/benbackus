@@ -212,7 +212,7 @@ function HeaderAnimation() {
     
     const HOLD_DURATION = 10000; // 10 seconds
     const WAIT_DURATION = 5000;  // 5 seconds
-    const FAST_SPEED = 8;        // Fast animation (8ms per frame)
+    const FAST_SPEED = 3;        // Very fast animation (3ms per frame)
     
     let phase = PHASE_IN;
     let holdTimer = null;
