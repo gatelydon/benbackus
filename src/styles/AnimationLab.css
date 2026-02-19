@@ -33,6 +33,35 @@ html, body, #root, .App {
   margin-bottom: 1rem;
 }
 
+.lab-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lab-collapse-btn {
+  display: none; /* Hidden on desktop */
+  width: 28px;
+  height: 28px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #888;
+  font-size: 0.8rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+.lab-collapse-btn:hover {
+  background: #333;
+  color: #fff;
+}
+
+.lab-resize-handle {
+  display: none; /* Hidden on desktop */
+}
+
 .lab-sidebar h2 {
   margin: 0;
   font-size: 1.3rem;
@@ -295,11 +324,26 @@ html, body, #root, .App {
   background: #333;
 }
 
-.lab-canvas {
+.lab-canvas-wrapper {
   flex: 1;
   position: relative;
   overflow: hidden;
   background: #1c1c1c;
+  cursor: grab;
+  touch-action: none;
+}
+
+.lab-canvas-wrapper:active {
+  cursor: grabbing;
+}
+
+.lab-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: none;
 }
 
 /* Playback controls */
@@ -378,17 +422,68 @@ html, body, #root, .App {
 /* Responsive */
 @media (max-width: 768px) {
   .animation-lab {
-    flex-direction: column;
+    flex-direction: column-reverse; /* Sidebar at bottom */
     height: 100vh;
   }
 
   .lab-sidebar {
     width: 100%;
     min-width: unset;
-    max-height: 40vh;
+    max-height: none;
+    height: 45%;
     border-right: none;
-    border-bottom: 1px solid #333;
-    padding: 0.75rem;
+    border-top: 1px solid #333;
+    border-bottom: none;
+    padding: 1rem 1.25rem; /* More padding */
+    position: relative;
+    transition: height 0.2s ease;
+  }
+
+  .lab-sidebar.collapsed {
+    height: auto !important;
+    min-height: 50px;
+    max-height: 50px;
+    overflow: hidden;
+  }
+
+  .lab-sidebar.collapsed .lab-section,
+  .lab-sidebar.collapsed .lab-actions {
+    display: none;
+  }
+
+  .lab-resize-handle {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    cursor: ns-resize;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to bottom, #1a1a1a, #141414);
+    touch-action: none;
+  }
+
+  .resize-grip {
+    width: 40px;
+    height: 4px;
+    background: #444;
+    border-radius: 2px;
+  }
+
+  .lab-resize-handle:hover .resize-grip,
+  .lab-resize-handle:active .resize-grip {
+    background: #666;
+  }
+
+  .lab-collapse-btn {
+    display: flex;
+  }
+
+  .lab-header {
+    padding-top: 0.5rem;
+    margin-top: 10px; /* Space for resize handle */
   }
 
   .lab-sidebar h2 {
@@ -396,19 +491,26 @@ html, body, #root, .App {
   }
 
   .lab-section {
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
   }
 
   .shape-buttons {
-    grid-template-columns: repeat(10, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
   }
 
-  .lab-canvas {
-    min-height: 300px;
+  .lab-main {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .lab-canvas-wrapper {
+    min-height: 200px;
   }
 
   .lab-controls {
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem 1rem;
   }
 
   .lab-play-btn,
@@ -416,5 +518,14 @@ html, body, #root, .App {
     width: 32px;
     height: 32px;
     font-size: 1rem;
+  }
+
+  .lab-slider {
+    flex-wrap: wrap;
+  }
+
+  .lab-slider label {
+    min-width: 100%;
+    margin-bottom: 0.25rem;
   }
 }

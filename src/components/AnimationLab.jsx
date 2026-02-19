@@ -168,9 +168,16 @@ const AnimationLab = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarHeight, setSidebarHeight] = useState(45); // percentage on mobile
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [lastTouch, setLastTouch] = useState({ x: 0, y: 0 });
   const canvasRef = useRef(null);
   const shapesRef = useRef([]);
   const animationRef = useRef(null);
+  const containerRef = useRef(null);
 
   // Save config to localStorage whenever it changes
   useEffect(() => {
@@ -187,8 +194,8 @@ const AnimationLab = () => {
   // Update canvas size on mount and resize
   useEffect(() => {
     const updateSize = () => {
-      if (canvasRef.current) {
-        const rect = canvasRef.current.getBoundingClientRect();
+      if (canvasRef.current && canvasRef.current.parentElement) {
+        const rect = canvasRef.current.parentElement.getBoundingClientRect();
         setCanvasSize({ width: rect.width, height: rect.height });
       }
     };
@@ -693,17 +700,132 @@ const AnimationLab = () => {
   const resetConfig = () => {
     setConfig(DEFAULT_CONFIG);
     setCurrentFrame(0);
+    setPanOffset({ x: 0, y: 0 });
   };
+
+  // Pan handlers for canvas
+  const handlePanStart = (clientX, clientY) => {
+    setIsPanning(true);
+    setLastTouch({ x: clientX, y: clientY });
+  };
+
+  const handlePanMove = (clientX, clientY) => {
+    if (!isPanning) return;
+    const dx = clientX - lastTouch.x;
+    const dy = clientY - lastTouch.y;
+    setPanOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+    setLastTouch({ x: clientX, y: clientY });
+  };
+
+  const handlePanEnd = () => {
+    setIsPanning(false);
+  };
+
+  // Mouse events for canvas panning
+  const handleMouseDown = (e) => {
+    if (e.button === 0) {
+      handlePanStart(e.clientX, e.clientY);
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    handlePanMove(e.clientX, e.clientY);
+  };
+
+  const handleMouseUp = () => {
+    handlePanEnd();
+  };
+
+  // Touch events for canvas panning
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 1) {
+      handlePanStart(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.touches.length === 1) {
+      handlePanMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    handlePanEnd();
+  };
+
+  // Resize divider handlers (mobile)
+  const handleResizeStart = (e) => {
+    e.preventDefault();
+    setIsResizing(true);
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    setLastTouch({ x: 0, y: clientY });
+  };
+
+  const handleResizeMove = useCallback((e) => {
+    if (!isResizing || !containerRef.current) return;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const containerHeight = containerRect.height;
+    const offsetFromBottom = containerRect.bottom - clientY;
+    const newHeight = (offsetFromBottom / containerHeight) * 100;
+    setSidebarHeight(Math.max(10, Math.min(80, newHeight)));
+  }, [isResizing]);
+
+  const handleResizeEnd = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  // Global mouse/touch handlers for resize
+  useEffect(() => {
+    if (isResizing) {
+      const handleMove = (e) => handleResizeMove(e);
+      const handleEnd = () => handleResizeEnd();
+      
+      window.addEventListener('mousemove', handleMove);
+      window.addEventListener('mouseup', handleEnd);
+      window.addEventListener('touchmove', handleMove);
+      window.addEventListener('touchend', handleEnd);
+      
+      return () => {
+        window.removeEventListener('mousemove', handleMove);
+        window.removeEventListener('mouseup', handleEnd);
+        window.removeEventListener('touchmove', handleMove);
+        window.removeEventListener('touchend', handleEnd);
+      };
+    }
+  }, [isResizing, handleResizeMove, handleResizeEnd]);
 
   const selectedShape = SHAPES.find(s => s.id === config.shape);
   const canRandomize = selectedShape && !selectedShape.fixedAspect;
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
   return (
-    <div className="animation-lab">
-      <div className="lab-sidebar">
+    <div className="animation-lab" ref={containerRef}>
+      <div 
+        className={`lab-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}
+        style={isMobile && !sidebarCollapsed ? { height: `${sidebarHeight}%` } : undefined}
+      >
+        {/* Resize handle for mobile */}
+        <div 
+          className="lab-resize-handle"
+          onMouseDown={handleResizeStart}
+          onTouchStart={handleResizeStart}
+        >
+          <div className="resize-grip" />
+        </div>
+        
         <div className="lab-header">
           <h2>Animation Lab</h2>
-          <Link to="/" className="lab-home-link">← Home</Link>
+          <div className="lab-header-actions">
+            <button 
+              className="lab-collapse-btn"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              title={sidebarCollapsed ? 'Expand' : 'Collapse'}
+            >
+              {sidebarCollapsed ? '▲' : '▼'}
+            </button>
+            <Link to="/" className="lab-home-link">← Home</Link>
+          </div>
         </div>
 
         <div className="lab-section">
@@ -942,7 +1064,22 @@ const AnimationLab = () => {
       </div>
 
       <div className="lab-main">
-        <div className="lab-canvas" ref={canvasRef} />
+        <div 
+          className="lab-canvas-wrapper"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div 
+            className="lab-canvas" 
+            ref={canvasRef}
+            style={{ transform: `translate(${panOffset.x}px, ${panOffset.y}px)` }}
+          />
+        </div>
         
         <div className="lab-controls">
           <button className="lab-play-btn" onClick={() => setIsPlaying(!isPlaying)}>
@@ -963,7 +1100,16 @@ const AnimationLab = () => {
             <span className="lab-frame-count">{currentFrame} / {maxFrames}</span>
           </div>
 
-          <button className="lab-reset-btn" onClick={() => setCurrentFrame(0)}>⟲</button>
+          <button className="lab-reset-btn" onClick={() => setCurrentFrame(0)} title="Reset animation">⟲</button>
+          {(panOffset.x !== 0 || panOffset.y !== 0) && (
+            <button 
+              className="lab-reset-btn" 
+              onClick={() => setPanOffset({ x: 0, y: 0 })}
+              title="Reset pan"
+            >
+              ⊕
+            </button>
+          )}
         </div>
       </div>
     </div>
