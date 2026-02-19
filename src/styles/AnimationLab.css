@@ -149,9 +149,6 @@ html, body, #root, .App {
   grid-template-columns: repeat(6, 1fr);
   gap: 3px;
   margin-bottom: 0.5rem;
-  max-height: 100px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
 }
 
 .arr-btn {
@@ -674,8 +671,7 @@ html, body, #root, .App {
   }
 
   .arrangement-buttons {
-    grid-template-columns: repeat(5, 1fr);
-    max-height: 70px;
+    grid-template-columns: repeat(6, 1fr);
   }
 
   .arr-btn {

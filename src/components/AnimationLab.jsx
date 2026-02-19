@@ -292,22 +292,113 @@ const ArrangementPreview = ({ arrangementId, size = 20, stroke = '#888' }) => {
     return points.join(' ');
   };
 
-  // For scatter/grid types, show dots instead
-  const isDotPattern = ['grid', 'honeycomb', 'phyllotaxis', 'doublehelix', 'fermat', 'concentric', 'starburst', 'random'].includes(arrangementId);
-  
-  if (isDotPattern) {
+  // Special patterns that need custom rendering
+  if (arrangementId === 'grid') {
     const dots = [];
-    const count = 9;
-    for (let i = 0; i < count; i++) {
-      const angle = (i / count) * Math.PI * 2;
-      const dr = r * (0.4 + Math.random() * 0.5);
-      dots.push({ x: cx + Math.cos(angle) * dr, y: cy + Math.sin(angle) * dr });
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 3; col++) {
+        dots.push({ x: cx - r + col * r, y: cy - r + row * r });
+      }
     }
     return (
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        {dots.map((d, i) => (
-          <circle key={i} cx={d.x} cy={d.y} r={1} fill={stroke} />
-        ))}
+        {dots.map((d, i) => <circle key={i} cx={d.x} cy={d.y} r={1.2} fill={stroke} />)}
+      </svg>
+    );
+  }
+  
+  if (arrangementId === 'honeycomb') {
+    const dots = [];
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 3; col++) {
+        const offset = row % 2 === 0 ? 0 : r * 0.5;
+        dots.push({ x: cx - r + col * r + offset, y: cy - r * 0.8 + row * r * 0.7 });
+      }
+    }
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {dots.map((d, i) => <circle key={i} cx={d.x} cy={d.y} r={1.2} fill={stroke} />)}
+      </svg>
+    );
+  }
+  
+  if (arrangementId === 'phyllotaxis') {
+    const dots = [];
+    const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < 12; i++) {
+      const pr = r * 0.9 * Math.sqrt(i / 12);
+      const theta = i * goldenAngle;
+      dots.push({ x: cx + pr * Math.cos(theta), y: cy + pr * Math.sin(theta) });
+    }
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {dots.map((d, i) => <circle key={i} cx={d.x} cy={d.y} r={1} fill={stroke} />)}
+      </svg>
+    );
+  }
+  
+  if (arrangementId === 'doublehelix') {
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <path d={`M${cx-r*0.4} ${cy-r} Q${cx+r*0.6} ${cy-r*0.3} ${cx-r*0.4} ${cy+r*0.3} Q${cx+r*0.6} ${cy+r} ${cx-r*0.4} ${cy+r}`} 
+          stroke={stroke} fill="none" strokeWidth="1" />
+        <path d={`M${cx+r*0.4} ${cy-r} Q${cx-r*0.6} ${cy-r*0.3} ${cx+r*0.4} ${cy+r*0.3} Q${cx-r*0.6} ${cy+r} ${cx+r*0.4} ${cy+r}`} 
+          stroke={stroke} fill="none" strokeWidth="1" />
+      </svg>
+    );
+  }
+  
+  if (arrangementId === 'fermat') {
+    const dots = [];
+    for (let i = 0; i < 16; i++) {
+      const angle = i * Math.PI * 0.5;
+      const pr = r * Math.sqrt(i / 16);
+      dots.push({ x: cx + pr * Math.cos(angle), y: cy + pr * Math.sin(angle) });
+    }
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {dots.map((d, i) => <circle key={i} cx={d.x} cy={d.y} r={0.8} fill={stroke} />)}
+      </svg>
+    );
+  }
+  
+  if (arrangementId === 'concentric') {
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <circle cx={cx} cy={cy} r={r * 0.3} stroke={stroke} fill="none" strokeWidth="1" />
+        <circle cx={cx} cy={cy} r={r * 0.6} stroke={stroke} fill="none" strokeWidth="1" />
+        <circle cx={cx} cy={cy} r={r * 0.9} stroke={stroke} fill="none" strokeWidth="1" />
+      </svg>
+    );
+  }
+  
+  if (arrangementId === 'starburst') {
+    const lines = [];
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      lines.push({ x1: cx, y1: cy, x2: cx + Math.cos(angle) * r, y2: cy + Math.sin(angle) * r });
+    }
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {lines.map((l, i) => <line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} stroke={stroke} strokeWidth="1" />)}
+      </svg>
+    );
+  }
+  
+  if (arrangementId === 'random') {
+    // Seeded random for consistency
+    const dots = [
+      { x: cx - r * 0.6, y: cy - r * 0.3 },
+      { x: cx + r * 0.4, y: cy - r * 0.7 },
+      { x: cx + r * 0.7, y: cy + r * 0.2 },
+      { x: cx - r * 0.2, y: cy + r * 0.6 },
+      { x: cx + r * 0.1, y: cy - r * 0.1 },
+      { x: cx - r * 0.5, y: cy + r * 0.1 },
+      { x: cx + r * 0.5, y: cy + r * 0.7 },
+    ];
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {dots.map((d, i) => <circle key={i} cx={d.x} cy={d.y} r={1} fill={stroke} />)}
       </svg>
     );
   }
