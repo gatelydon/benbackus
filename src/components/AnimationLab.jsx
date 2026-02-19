@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { Play, Pause, RotateCcw, Move, ChevronUp, ChevronDown, ArrowLeft } from 'lucide-react';
 import '../styles/AnimationLab.css';
 
 const SHAPES = [
@@ -822,9 +823,9 @@ const AnimationLab = () => {
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               title={sidebarCollapsed ? 'Expand' : 'Collapse'}
             >
-              {sidebarCollapsed ? '▲' : '▼'}
+              {sidebarCollapsed ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
-            <Link to="/" className="lab-home-link">← Home</Link>
+            <Link to="/" className="lab-home-link"><ArrowLeft size={14} /> Home</Link>
           </div>
         </div>
 
@@ -1083,7 +1084,7 @@ const AnimationLab = () => {
         
         <div className="lab-controls">
           <button className="lab-play-btn" onClick={() => setIsPlaying(!isPlaying)}>
-            {isPlaying ? '⏸' : '▶'}
+            {isPlaying ? <Pause size={18} /> : <Play size={18} />}
           </button>
           
           <div className="lab-timeline">
@@ -1100,14 +1101,16 @@ const AnimationLab = () => {
             <span className="lab-frame-count">{currentFrame} / {maxFrames}</span>
           </div>
 
-          <button className="lab-reset-btn" onClick={() => setCurrentFrame(0)} title="Reset animation">⟲</button>
+          <button className="lab-reset-btn" onClick={() => setCurrentFrame(0)} title="Reset animation">
+            <RotateCcw size={16} />
+          </button>
           {(panOffset.x !== 0 || panOffset.y !== 0) && (
             <button 
               className="lab-reset-btn" 
               onClick={() => setPanOffset({ x: 0, y: 0 })}
               title="Reset pan"
             >
-              ⊕
+              <Move size={16} />
             </button>
           )}
         </div>

@@ -43,18 +43,18 @@ html, body, #root, .App {
   display: none; /* Hidden on desktop */
   width: 28px;
   height: 28px;
-  background: #2a2a2a;
-  border: 1px solid #444;
+  background: transparent;
+  border: 1px solid #333;
   border-radius: 4px;
-  color: #888;
-  font-size: 0.8rem;
+  color: #666;
   cursor: pointer;
   align-items: center;
   justify-content: center;
+  transition: all 0.15s;
 }
 
 .lab-collapse-btn:hover {
-  background: #333;
+  border-color: #555;
   color: #fff;
 }
 
@@ -274,18 +274,18 @@ html, body, #root, .App {
 
 .lab-btn {
   padding: 0.5rem 0.75rem;
-  background: #2a2a2a;
-  border: 1px solid #444;
+  background: transparent;
+  border: 1px solid #333;
   border-radius: 4px;
-  color: #e0e0e0;
-  font-size: 0.85rem;
+  color: #666;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .lab-btn:hover {
-  background: #333;
-  border-color: #666;
+  border-color: #555;
+  color: #fff;
 }
 
 .lab-btn-danger {
@@ -308,20 +308,22 @@ html, body, #root, .App {
 }
 
 .lab-home-link {
-  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #666;
   text-decoration: none;
-  font-size: 0.85rem;
-  padding: 0.3rem 0.6rem;
-  background: #2a2a2a;
-  border: 1px solid #444;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.6rem;
+  background: transparent;
+  border: 1px solid #333;
   border-radius: 4px;
   transition: all 0.15s;
 }
 
 .lab-home-link:hover {
   color: #fff;
-  border-color: #666;
-  background: #333;
+  border-color: #555;
 }
 
 .lab-canvas-wrapper {
@@ -362,10 +364,9 @@ html, body, #root, .App {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #2a2a2a;
-  border: 1px solid #444;
-  color: #e0e0e0;
-  font-size: 1.1rem;
+  background: transparent;
+  border: 1px solid #333;
+  color: #666;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -376,8 +377,8 @@ html, body, #root, .App {
 
 .lab-play-btn:hover,
 .lab-reset-btn:hover {
-  background: #333;
-  border-color: #666;
+  border-color: #555;
+  color: #fff;
 }
 
 .lab-timeline {
