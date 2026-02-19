@@ -56,8 +56,8 @@ const ANCHORS = [
 ];
 
 const DEFAULT_CONFIG = {
-  shape: 'square',
-  arrangement: 'circle',
+  shape: 'star3',
+  arrangement: 'rose8',
   anchor: 'top-left',
   startingPoints: 6,
   totalShapes: 342,
@@ -71,10 +71,10 @@ const DEFAULT_CONFIG = {
   gradientStart: '#ffffff',
   gradientEnd: '#888888',
   rotateWithPosition: true,
-  animatedRotation: false,
+  animatedRotation: true,
   rotationSpeed: 2,
   animationSpeed: 50,
-  keepAllVisible: true, // When true, all shapes stay visible (no draw/hide cycle)
+  keepAllVisible: true,
 };
 
 // SVG path generators - now anchored to top-left (0,0)
