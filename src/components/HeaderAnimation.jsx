@@ -85,7 +85,8 @@ function HeaderAnimation() {
       width: ${radius * 2 + overlayPadding * 2}px;
       height: ${radius + overlayPadding * 2}px;
       cursor: pointer;
-      z-index: 1;
+      pointer-events: auto;
+      z-index: 10;
     `;
     leftOverlay.addEventListener('click', navigateToAnimationLab);
     wrapper.appendChild(leftOverlay);
@@ -102,7 +103,8 @@ function HeaderAnimation() {
         width: ${radius * 2 + overlayPadding * 2}px;
         height: ${radius + overlayPadding * 2}px;
         cursor: pointer;
-        z-index: 1;
+        pointer-events: auto;
+        z-index: 10;
       `;
       rightOverlay.addEventListener('click', navigateToAnimationLab);
       wrapper.appendChild(rightOverlay);
