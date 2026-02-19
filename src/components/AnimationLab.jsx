@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Pause, RotateCcw, Move, ChevronUp, ChevronDown, ArrowLeft } from 'lucide-react';
+import { Play, Pause, RotateCcw, Maximize, ChevronUp, ChevronDown, ArrowLeft } from 'lucide-react';
 import '../styles/AnimationLab.css';
 
 const SHAPES = [
@@ -172,9 +172,11 @@ const AnimationLab = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarHeight, setSidebarHeight] = useState(45); // percentage on mobile
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
   const [isPanning, setIsPanning] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [lastTouch, setLastTouch] = useState({ x: 0, y: 0 });
+  const [lastPinchDist, setLastPinchDist] = useState(null);
   const canvasRef = useRef(null);
   const shapesRef = useRef([]);
   const animationRef = useRef(null);
@@ -653,29 +655,6 @@ const AnimationLab = () => {
     return () => clearInterval(animationRef.current);
   }, [isPlaying, maxFrames, config.animationSpeed]);
 
-  // Scroll wheel control on canvas
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const handleWheel = (e) => {
-      e.preventDefault();
-      // Scroll down = advance, scroll up = reverse
-      // Use deltaY normalized to steps (divide by ~50 for reasonable speed)
-      const steps = Math.sign(e.deltaY) * Math.max(1, Math.floor(Math.abs(e.deltaY) / 30));
-      setCurrentFrame(prev => {
-        let next = prev + steps;
-        // Wrap around
-        if (next > maxFrames) next = next - maxFrames;
-        if (next < 0) next = maxFrames + next;
-        return Math.max(0, Math.min(maxFrames, next));
-      });
-    };
-
-    canvas.addEventListener('wheel', handleWheel, { passive: false });
-    return () => canvas.removeEventListener('wheel', handleWheel);
-  }, [maxFrames]);
-
   const handleConfigChange = (key, value) => {
     setConfig(prev => ({ ...prev, [key]: value }));
   };
@@ -702,6 +681,7 @@ const AnimationLab = () => {
     setConfig(DEFAULT_CONFIG);
     setCurrentFrame(0);
     setPanOffset({ x: 0, y: 0 });
+    setZoom(1);
   };
 
   // Pan handlers for canvas
@@ -737,21 +717,52 @@ const AnimationLab = () => {
     handlePanEnd();
   };
 
-  // Touch events for canvas panning
+  // Get distance between two touch points
+  const getTouchDistance = (touches) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  // Touch events for canvas panning and pinch zoom
   const handleTouchStart = (e) => {
     if (e.touches.length === 1) {
       handlePanStart(e.touches[0].clientX, e.touches[0].clientY);
+      setLastPinchDist(null);
+    } else if (e.touches.length === 2) {
+      setIsPanning(false);
+      setLastPinchDist(getTouchDistance(e.touches));
     }
   };
 
   const handleTouchMove = (e) => {
-    if (e.touches.length === 1) {
+    if (e.touches.length === 1 && !lastPinchDist) {
       handlePanMove(e.touches[0].clientX, e.touches[0].clientY);
+    } else if (e.touches.length === 2) {
+      e.preventDefault();
+      const dist = getTouchDistance(e.touches);
+      if (lastPinchDist) {
+        const scale = dist / lastPinchDist;
+        setZoom(prev => Math.max(0.25, Math.min(4, prev * scale)));
+      }
+      setLastPinchDist(dist);
     }
   };
 
-  const handleTouchEnd = () => {
-    handlePanEnd();
+  const handleTouchEnd = (e) => {
+    if (e.touches.length < 2) {
+      setLastPinchDist(null);
+    }
+    if (e.touches.length === 0) {
+      handlePanEnd();
+    }
+  };
+
+  // Scroll wheel for zoom
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    setZoom(prev => Math.max(0.25, Math.min(4, prev * delta)));
   };
 
   // Resize divider handlers (mobile)
@@ -1074,11 +1085,12 @@ const AnimationLab = () => {
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
+          onWheel={handleWheel}
         >
           <div 
             className="lab-canvas" 
             ref={canvasRef}
-            style={{ transform: `translate(${panOffset.x}px, ${panOffset.y}px)` }}
+            style={{ transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom})` }}
           />
         </div>
         
@@ -1104,13 +1116,13 @@ const AnimationLab = () => {
           <button className="lab-reset-btn" onClick={() => setCurrentFrame(0)} title="Reset animation">
             <RotateCcw size={16} />
           </button>
-          {(panOffset.x !== 0 || panOffset.y !== 0) && (
+          {(panOffset.x !== 0 || panOffset.y !== 0 || zoom !== 1) && (
             <button 
               className="lab-reset-btn" 
-              onClick={() => setPanOffset({ x: 0, y: 0 })}
-              title="Reset pan"
+              onClick={() => { setPanOffset({ x: 0, y: 0 }); setZoom(1); }}
+              title="Reset view"
             >
-              <Move size={16} />
+              <Maximize size={16} />
             </button>
           )}
         </div>
