@@ -74,6 +74,7 @@ const DEFAULT_CONFIG = {
   animatedRotation: false,
   rotationSpeed: 2,
   animationSpeed: 50,
+  keepAllVisible: true, // When true, all shapes stay visible (no draw/hide cycle)
 };
 
 // SVG path generators - now anchored to top-left (0,0)
@@ -593,33 +594,43 @@ const AnimationLab = () => {
   // Update visibility and rotation based on current frame
   // First half: draw shapes in order
   // Second half: hide shapes in same order (shuffle out)
+  // OR if keepAllVisible: all shapes stay visible, only rotation animates
   useEffect(() => {
     const totalShapes = config.totalShapes;
-    let visibleSet;
-    
-    if (currentFrame <= totalShapes) {
-      // Draw phase: show shapes 0 to currentFrame
-      visibleSet = new Set(drawOrder.slice(0, currentFrame));
-    } else {
-      // Hide phase: hide shapes in the order they were drawn
-      const hideCount = currentFrame - totalShapes;
-      // Show all shapes except the first hideCount that were drawn
-      visibleSet = new Set(drawOrder.slice(hideCount, totalShapes));
-    }
     
     shapesRef.current.forEach((svg) => {
       const idx = parseInt(svg.dataset.shapeIndex);
-      const isVisible = visibleSet.has(idx);
-      svg.style.opacity = isVisible ? '1' : '0';
+      const baseRotation = parseFloat(svg.dataset.baseRotation || 0);
       
-      // Apply animated rotation if enabled
-      if (config.animatedRotation && isVisible) {
-        const baseRotation = parseFloat(svg.dataset.baseRotation || 0);
-        const animatedAngle = baseRotation + (currentFrame * config.rotationSpeed);
-        svg.style.transform = `rotate(${animatedAngle}deg)`;
+      if (config.keepAllVisible) {
+        // All shapes always visible
+        svg.style.opacity = '1';
+        
+        // Apply continuous rotation if enabled
+        if (config.animatedRotation) {
+          const animatedAngle = baseRotation + (currentFrame * config.rotationSpeed);
+          svg.style.transform = `rotate(${animatedAngle}deg)`;
+        }
+      } else {
+        // Normal draw/hide cycle
+        let visibleSet;
+        if (currentFrame <= totalShapes) {
+          visibleSet = new Set(drawOrder.slice(0, currentFrame));
+        } else {
+          const hideCount = currentFrame - totalShapes;
+          visibleSet = new Set(drawOrder.slice(hideCount, totalShapes));
+        }
+        
+        const isVisible = visibleSet.has(idx);
+        svg.style.opacity = isVisible ? '1' : '0';
+        
+        if (config.animatedRotation && isVisible) {
+          const animatedAngle = baseRotation + (currentFrame * config.rotationSpeed);
+          svg.style.transform = `rotate(${animatedAngle}deg)`;
+        }
       }
     });
-  }, [currentFrame, drawOrder, config.totalShapes, config.animatedRotation, config.rotationSpeed]);
+  }, [currentFrame, drawOrder, config.totalShapes, config.animatedRotation, config.rotationSpeed, config.keepAllVisible]);
 
   // Animation loop
   useEffect(() => {
@@ -874,6 +885,16 @@ const AnimationLab = () => {
 
         <div className="lab-section">
           <h3>Animation</h3>
+          
+          <label className="lab-checkbox">
+            <input
+              type="checkbox"
+              checked={config.keepAllVisible}
+              onChange={(e) => handleConfigChange('keepAllVisible', e.target.checked)}
+            />
+            Keep all visible (no draw/hide)
+          </label>
+
           <div className="lab-slider">
             <label>Speed: {config.animationSpeed}ms</label>
             <input
