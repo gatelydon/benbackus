@@ -57,6 +57,11 @@ function HeaderAnimation() {
     document.body.appendChild(wrapper);
     wrapperRef.current = wrapper;
 
+    // Navigate to animation lab
+    const navigateToAnimationLab = () => {
+      window.location.href = `${process.env.PUBLIC_URL}/#/animation-lab`;
+    };
+
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
     const isMobile = windowWidth < 768;
@@ -100,11 +105,13 @@ function HeaderAnimation() {
         top: ${data.y}px;
         transform: rotate(${data.baseRotation}deg);
         transform-origin: center center;
-        pointer-events: none;
+        pointer-events: auto;
+        cursor: pointer;
         opacity: 0;
       `;
       svg.dataset.index = data.index;
       svg.dataset.baseRotation = data.baseRotation;
+      svg.addEventListener('click', navigateToAnimationLab);
 
       const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
       polygon.setAttribute('points', starPath);
@@ -132,12 +139,14 @@ function HeaderAnimation() {
           top: ${data.y}px;
           transform: rotate(${-data.baseRotation}deg);
           transform-origin: center center;
-          pointer-events: none;
+          pointer-events: auto;
+          cursor: pointer;
           opacity: 0;
         `;
         svg.dataset.index = data.index;
         svg.dataset.baseRotation = -data.baseRotation;
         svg.dataset.mirror = 'true';
+        svg.addEventListener('click', navigateToAnimationLab);
 
         const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
         polygon.setAttribute('points', starPath);
