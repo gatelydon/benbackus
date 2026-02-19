@@ -1,0 +1,121 @@
+.animation-library {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: #1c1c1c;
+  color: #e0e0e0;
+}
+
+.animation-library h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+.library-subtitle {
+  text-align: center;
+  color: #888;
+  margin-bottom: 40px;
+}
+
+.animation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (max-width: 768px) {
+  .animation-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+  }
+}
+
+.animation-card {
+  background: #2a2a2a;
+  border: 2px solid #3a3a3a;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.animation-card:hover {
+  border-color: #666;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.animation-card:active {
+  transform: translateY(0);
+}
+
+.animation-preview {
+  width: 200px;
+  height: 200px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.animation-info {
+  text-align: center;
+  width: 100%;
+}
+
+.animation-info h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  color: #ffffff;
+}
+
+.animation-info p {
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.copy-hint {
+  font-size: 0.75rem;
+  color: #666;
+  display: inline-block;
+  padding: 4px 12px;
+  background: #333;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.animation-card:hover .copy-hint {
+  background: #444;
+  color: #aaa;
+}
+
+.config-preview {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+}
+
+.config-preview h3 {
+  margin: 0 0 12px 0;
+  color: #ffffff;
+}
+
+.config-preview pre {
+  background: #1c1c1c;
+  padding: 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  color: #aaa;
+  margin: 0;
+}
