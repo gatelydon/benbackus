@@ -852,8 +852,8 @@ const AnimationLab = () => {
               >
                 <ShapePreview 
                   shapeId={s.id} 
-                  size={24} 
-                  stroke={config.shape === s.id ? '#fff' : '#666'}
+                  size={18} 
+                  stroke={config.shape === s.id ? '#fff' : '#555'}
                 />
               </button>
             ))}
@@ -897,14 +897,18 @@ const AnimationLab = () => {
 
         <div className="lab-section">
           <h3>Arrangement</h3>
-          <select
-            value={config.arrangement}
-            onChange={(e) => handleConfigChange('arrangement', e.target.value)}
-          >
+          <div className="arrangement-buttons">
             {ARRANGEMENTS.map(a => (
-              <option key={a.id} value={a.id}>{a.name}</option>
+              <button
+                key={a.id}
+                className={`arr-btn ${config.arrangement === a.id ? 'active' : ''}`}
+                onClick={() => handleConfigChange('arrangement', a.id)}
+                title={a.name}
+              >
+                {a.name.replace(/[()]/g, '').substring(0, 8)}
+              </button>
             ))}
-          </select>
+          </div>
 
           <div className="lab-row">
             <label>Anchor:</label>
