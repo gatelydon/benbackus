@@ -42,14 +42,14 @@ function HeaderAnimation() {
     const container = containerRef.current;
     if (!container) return;
 
-    // Create a fixed wrapper for all shapes
+    // Create an absolute wrapper for all shapes (stays in place when scrolling)
     const wrapper = document.createElement('div');
     wrapper.style.cssText = `
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
+      height: 100vh;
       pointer-events: none;
       z-index: 0;
       overflow: hidden;
