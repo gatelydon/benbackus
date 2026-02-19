@@ -20,6 +20,32 @@ const ARRANGEMENTS = [
   { id: 'square', name: 'Square' },
   { id: 'figure8', name: 'Figure-8' },
   { id: 'spiral', name: 'Spiral' },
+  // Mathematical curves
+  { id: 'lissajous', name: 'Lissajous (3:2)' },
+  { id: 'lissajous34', name: 'Lissajous (3:4)' },
+  { id: 'rose3', name: 'Rose (3 petals)' },
+  { id: 'rose5', name: 'Rose (5 petals)' },
+  { id: 'rose8', name: 'Rose (8 petals)' },
+  { id: 'cardioid', name: 'Cardioid' },
+  { id: 'astroid', name: 'Astroid' },
+  { id: 'lemniscate', name: 'Lemniscate (∞)' },
+  // Organic/natural
+  { id: 'phyllotaxis', name: 'Phyllotaxis (Sunflower)' },
+  { id: 'doublehelix', name: 'Double Helix' },
+  { id: 'fermat', name: 'Fermat Spiral' },
+  { id: 'wave', name: 'Wave' },
+  // Geometric
+  { id: 'grid', name: 'Grid' },
+  { id: 'honeycomb', name: 'Honeycomb' },
+  { id: 'concentric', name: 'Concentric Rings' },
+  { id: 'starburst', name: 'Starburst' },
+  { id: 'triangle', name: 'Triangle' },
+  { id: 'pentagonpath', name: 'Pentagon Path' },
+  { id: 'hexagon', name: 'Hexagon Path' },
+  // Fun
+  { id: 'heart', name: 'Heart' },
+  { id: 'random', name: 'Random Scatter' },
+  { id: 'butterfly', name: 'Butterfly Curve' },
 ];
 
 const ANCHORS = [
@@ -166,13 +192,196 @@ const AnimationLab = () => {
           default: return { x: centerX - halfSize, y: centerY + halfSize - sideProgress * 2 * halfSize };
         }
       }
-      case 'figure8': {
+      case 'figure8':
         return { x: centerX + Math.sin(angle) * radius, y: centerY + Math.sin(angle * 2) * radius * 0.5 };
-      }
       case 'spiral': {
         const spiralRadius = radius * 0.3 + (radius * 0.7 * progress);
         return { x: centerX + Math.cos(angle * 3) * spiralRadius, y: centerY + Math.sin(angle * 3) * spiralRadius };
       }
+      
+      // Mathematical curves
+      case 'lissajous':
+        return { x: centerX + Math.sin(3 * angle) * radius, y: centerY + Math.sin(2 * angle) * radius };
+      case 'lissajous34':
+        return { x: centerX + Math.sin(3 * angle) * radius, y: centerY + Math.sin(4 * angle) * radius };
+      case 'rose3': {
+        const r = radius * Math.cos(3 * angle);
+        return { x: centerX + r * Math.cos(angle), y: centerY + r * Math.sin(angle) };
+      }
+      case 'rose5': {
+        const r = radius * Math.cos(5 * angle);
+        return { x: centerX + r * Math.cos(angle), y: centerY + r * Math.sin(angle) };
+      }
+      case 'rose8': {
+        const r = radius * Math.cos(4 * angle);
+        return { x: centerX + r * Math.cos(angle), y: centerY + r * Math.sin(angle) };
+      }
+      case 'cardioid': {
+        const r = radius * 0.5 * (1 - Math.cos(angle));
+        return { x: centerX + r * Math.cos(angle), y: centerY + r * Math.sin(angle) };
+      }
+      case 'astroid':
+        return { 
+          x: centerX + radius * Math.pow(Math.cos(angle), 3), 
+          y: centerY + radius * Math.pow(Math.sin(angle), 3) 
+        };
+      case 'lemniscate': {
+        const scale = radius * 1.2;
+        const cos2 = Math.cos(2 * angle);
+        if (cos2 < 0) {
+          const r = scale * Math.sqrt(Math.abs(cos2));
+          return { x: centerX + r * Math.cos(angle), y: centerY - r * Math.sin(angle) };
+        }
+        const r = scale * Math.sqrt(cos2);
+        return { x: centerX + r * Math.cos(angle), y: centerY + r * Math.sin(angle) };
+      }
+      
+      // Organic/natural
+      case 'phyllotaxis': {
+        const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+        const r = radius * Math.sqrt(index) / Math.sqrt(total) * 1.2;
+        const theta = index * goldenAngle;
+        return { x: centerX + r * Math.cos(theta), y: centerY + r * Math.sin(theta) };
+      }
+      case 'doublehelix': {
+        const helixAngle = progress * Math.PI * 6;
+        const yOffset = (progress - 0.5) * radius * 2;
+        const strand = index % 2;
+        const phaseShift = strand * Math.PI;
+        return { 
+          x: centerX + Math.cos(helixAngle + phaseShift) * radius * 0.5, 
+          y: centerY + yOffset 
+        };
+      }
+      case 'fermat': {
+        const fermatAngle = progress * Math.PI * 8;
+        const r = radius * Math.sqrt(progress);
+        return { x: centerX + r * Math.cos(fermatAngle), y: centerY + r * Math.sin(fermatAngle) };
+      }
+      case 'wave': {
+        const waveX = (progress - 0.5) * radius * 3;
+        const waveY = Math.sin(progress * Math.PI * 4) * radius * 0.5;
+        return { x: centerX + waveX, y: centerY + waveY };
+      }
+      
+      // Geometric
+      case 'grid': {
+        const cols = Math.ceil(Math.sqrt(total));
+        const rows = Math.ceil(total / cols);
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+        const cellWidth = (radius * 2) / (cols - 1 || 1);
+        const cellHeight = (radius * 2) / (rows - 1 || 1);
+        return { 
+          x: centerX - radius + col * cellWidth, 
+          y: centerY - radius + row * cellHeight 
+        };
+      }
+      case 'honeycomb': {
+        const cols = Math.ceil(Math.sqrt(total * 1.5));
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+        const cellWidth = (radius * 2) / cols;
+        const cellHeight = cellWidth * 0.866;
+        const xOffset = (row % 2) * (cellWidth / 2);
+        return { 
+          x: centerX - radius + col * cellWidth + xOffset, 
+          y: centerY - radius + row * cellHeight 
+        };
+      }
+      case 'concentric': {
+        const rings = 5;
+        const ring = Math.floor(progress * rings);
+        const ringProgress = (progress * rings) % 1;
+        const ringRadius = radius * (ring + 1) / rings;
+        const ringAngle = ringProgress * Math.PI * 2;
+        return { x: centerX + Math.cos(ringAngle) * ringRadius, y: centerY + Math.sin(ringAngle) * ringRadius };
+      }
+      case 'starburst': {
+        const rays = 12;
+        const ray = index % rays;
+        const rayProgress = Math.floor(index / rays) / Math.ceil(total / rays);
+        const rayAngle = (ray / rays) * Math.PI * 2;
+        const r = radius * rayProgress;
+        return { x: centerX + Math.cos(rayAngle) * r, y: centerY + Math.sin(rayAngle) * r };
+      }
+      case 'triangle': {
+        const side = Math.floor(progress * 3);
+        const sideProgress = (progress * 3) % 1;
+        const r = radius;
+        const vertices = [
+          { x: centerX, y: centerY - r },
+          { x: centerX + r * 0.866, y: centerY + r * 0.5 },
+          { x: centerX - r * 0.866, y: centerY + r * 0.5 },
+        ];
+        const start = vertices[side];
+        const end = vertices[(side + 1) % 3];
+        return { 
+          x: start.x + (end.x - start.x) * sideProgress, 
+          y: start.y + (end.y - start.y) * sideProgress 
+        };
+      }
+      case 'pentagonpath': {
+        const sides = 5;
+        const side = Math.floor(progress * sides);
+        const sideProgress = (progress * sides) % 1;
+        const vertices = [];
+        for (let i = 0; i < sides; i++) {
+          const a = (i / sides) * Math.PI * 2 - Math.PI / 2;
+          vertices.push({ x: centerX + Math.cos(a) * radius, y: centerY + Math.sin(a) * radius });
+        }
+        const start = vertices[side];
+        const end = vertices[(side + 1) % sides];
+        return { 
+          x: start.x + (end.x - start.x) * sideProgress, 
+          y: start.y + (end.y - start.y) * sideProgress 
+        };
+      }
+      case 'hexagon': {
+        const sides = 6;
+        const side = Math.floor(progress * sides);
+        const sideProgress = (progress * sides) % 1;
+        const vertices = [];
+        for (let i = 0; i < sides; i++) {
+          const a = (i / sides) * Math.PI * 2 - Math.PI / 2;
+          vertices.push({ x: centerX + Math.cos(a) * radius, y: centerY + Math.sin(a) * radius });
+        }
+        const start = vertices[side];
+        const end = vertices[(side + 1) % sides];
+        return { 
+          x: start.x + (end.x - start.x) * sideProgress, 
+          y: start.y + (end.y - start.y) * sideProgress 
+        };
+      }
+      
+      // Fun
+      case 'heart': {
+        const t = angle;
+        const scale = radius / 16;
+        return { 
+          x: centerX + scale * 16 * Math.pow(Math.sin(t), 3), 
+          y: centerY - scale * (13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))
+        };
+      }
+      case 'random': {
+        const seed = index * 9301 + 49297;
+        const rand1 = ((seed % 233280) / 233280);
+        const rand2 = (((seed * 7) % 233280) / 233280);
+        return { 
+          x: centerX + (rand1 - 0.5) * radius * 2, 
+          y: centerY + (rand2 - 0.5) * radius * 2 
+        };
+      }
+      case 'butterfly': {
+        const t = angle * 2;
+        const exp = Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5);
+        const scale = radius / 4;
+        return { 
+          x: centerX + Math.sin(t) * exp * scale, 
+          y: centerY - Math.cos(t) * exp * scale 
+        };
+      }
+      
       default:
         return { x: centerX, y: centerY };
     }
