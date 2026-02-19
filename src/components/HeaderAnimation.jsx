@@ -76,10 +76,11 @@ function HeaderAnimation() {
     };
 
     // Create visible clickable overlay for left figure-8 (debug mode)
+    // Appended directly to body to avoid wrapper's pointer-events: none
     const leftOverlay = document.createElement('div');
     const overlayPadding = CONFIG.shapeSize;
     leftOverlay.style.cssText = `
-      position: absolute;
+      position: fixed;
       left: ${centerX - radius - overlayPadding}px;
       top: ${centerY - radius * 0.5 - overlayPadding}px;
       width: ${radius * 2 + overlayPadding * 2}px;
@@ -90,6 +91,7 @@ function HeaderAnimation() {
       border: 2px solid red;
       background: transparent;
       -webkit-tap-highlight-color: rgba(255, 0, 0, 0.3);
+      touch-action: auto;
     `;
     leftOverlay.addEventListener('click', () => {
       leftOverlay.style.background = 'rgba(0, 255, 0, 0.5)';
@@ -103,7 +105,7 @@ function HeaderAnimation() {
       leftOverlay.style.background = 'rgba(0, 255, 0, 0.5)';
       setTimeout(navigateToAnimationLab, 200);
     });
-    wrapper.appendChild(leftOverlay);
+    document.body.appendChild(leftOverlay);
 
     // Create overlay for right figure-8 (desktop only)
     let rightOverlay = null;
@@ -111,7 +113,7 @@ function HeaderAnimation() {
       const rightCenterX = windowWidth - 200 - CONFIG.arrangementRadius;
       rightOverlay = document.createElement('div');
       rightOverlay.style.cssText = `
-        position: absolute;
+        position: fixed;
         left: ${rightCenterX - radius - overlayPadding}px;
         top: ${centerY - radius * 0.5 - overlayPadding}px;
         width: ${radius * 2 + overlayPadding * 2}px;
@@ -122,6 +124,7 @@ function HeaderAnimation() {
         border: 2px solid red;
         background: transparent;
         -webkit-tap-highlight-color: rgba(255, 0, 0, 0.3);
+        touch-action: auto;
       `;
       rightOverlay.addEventListener('click', () => {
         rightOverlay.style.background = 'rgba(0, 255, 0, 0.5)';
@@ -135,7 +138,7 @@ function HeaderAnimation() {
         rightOverlay.style.background = 'rgba(0, 255, 0, 0.5)';
         setTimeout(navigateToAnimationLab, 200);
       });
-      wrapper.appendChild(rightOverlay);
+      document.body.appendChild(rightOverlay);
     }
     
     for (let i = 0; i < CONFIG.totalShapes; i++) {
@@ -347,6 +350,8 @@ function HeaderAnimation() {
         wrapperRef.current.remove();
         wrapperRef.current = null;
       }
+      if (leftOverlay) leftOverlay.remove();
+      if (rightOverlay) rightOverlay.remove();
     };
   }, []);
 
