@@ -146,14 +146,38 @@ const ShapePreview = ({ shapeId, size = 20, stroke = '#888', fill = 'none' }) =>
   );
 };
 
+const STORAGE_KEY = 'animationLabConfig';
+
+// Load config from localStorage or use default
+const loadConfig = () => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      return { ...DEFAULT_CONFIG, ...JSON.parse(saved) };
+    }
+  } catch (e) {
+    console.warn('Failed to load config from localStorage:', e);
+  }
+  return DEFAULT_CONFIG;
+};
+
 const AnimationLab = () => {
-  const [config, setConfig] = useState(DEFAULT_CONFIG);
+  const [config, setConfig] = useState(loadConfig);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
   const canvasRef = useRef(null);
   const shapesRef = useRef([]);
   const animationRef = useRef(null);
+
+  // Save config to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+    } catch (e) {
+      console.warn('Failed to save config to localStorage:', e);
+    }
+  }, [config]);
 
   // Full animation: draw all shapes, then hide all shapes (double the frames)
   const maxFrames = config.totalShapes * 2;
