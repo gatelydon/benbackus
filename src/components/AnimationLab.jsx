@@ -164,7 +164,7 @@ const loadConfig = () => {
 
 const AnimationLab = () => {
   const [config, setConfig] = useState(loadConfig);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
   const canvasRef = useRef(null);
