@@ -75,7 +75,7 @@ function HeaderAnimation() {
       window.location.href = `${process.env.PUBLIC_URL}/#/animation-lab`;
     };
 
-    // Create visible clickable overlay for left figure-8 (debug mode)
+    // Invisible clickable overlay for left figure-8
     // Appended directly to body to avoid wrapper's pointer-events: none
     const leftOverlay = document.createElement('div');
     const overlayPadding = CONFIG.shapeSize;
@@ -88,22 +88,13 @@ function HeaderAnimation() {
       cursor: pointer;
       pointer-events: auto;
       z-index: 9999;
-      border: 2px solid red;
-      background: transparent;
-      -webkit-tap-highlight-color: rgba(255, 0, 0, 0.3);
+      -webkit-tap-highlight-color: transparent;
       touch-action: auto;
     `;
-    leftOverlay.addEventListener('click', () => {
-      leftOverlay.style.background = 'rgba(0, 255, 0, 0.5)';
-      setTimeout(navigateToAnimationLab, 200);
-    });
-    leftOverlay.addEventListener('touchstart', () => {
-      leftOverlay.style.background = 'rgba(0, 0, 255, 0.5)';
-    });
+    leftOverlay.addEventListener('click', navigateToAnimationLab);
     leftOverlay.addEventListener('touchend', (e) => {
       e.preventDefault();
-      leftOverlay.style.background = 'rgba(0, 255, 0, 0.5)';
-      setTimeout(navigateToAnimationLab, 200);
+      navigateToAnimationLab();
     });
     document.body.appendChild(leftOverlay);
 
@@ -121,22 +112,13 @@ function HeaderAnimation() {
         cursor: pointer;
         pointer-events: auto;
         z-index: 9999;
-        border: 2px solid red;
-        background: transparent;
-        -webkit-tap-highlight-color: rgba(255, 0, 0, 0.3);
+        -webkit-tap-highlight-color: transparent;
         touch-action: auto;
       `;
-      rightOverlay.addEventListener('click', () => {
-        rightOverlay.style.background = 'rgba(0, 255, 0, 0.5)';
-        setTimeout(navigateToAnimationLab, 200);
-      });
-      rightOverlay.addEventListener('touchstart', () => {
-        rightOverlay.style.background = 'rgba(0, 0, 255, 0.5)';
-      });
+      rightOverlay.addEventListener('click', navigateToAnimationLab);
       rightOverlay.addEventListener('touchend', (e) => {
         e.preventDefault();
-        rightOverlay.style.background = 'rgba(0, 255, 0, 0.5)';
-        setTimeout(navigateToAnimationLab, 200);
+        navigateToAnimationLab();
       });
       document.body.appendChild(rightOverlay);
     }
