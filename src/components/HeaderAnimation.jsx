@@ -189,9 +189,9 @@ function HeaderAnimation() {
     let holdTimer = null;
     let rotationFrame = 0; // Separate counter for continuous rotation
 
-    // Easing function (ease-in-out cubic)
-    const easeInOutCubic = (t) => {
-      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    // Easing function (ease-in only - starts slow, stays fast)
+    const easeInQuad = (t) => {
+      return t * t;
     };
 
     // Animation loop
@@ -202,7 +202,7 @@ function HeaderAnimation() {
         // Fast phase in with easing
         frameRef.current++;
         const progress = frameRef.current / CONFIG.totalShapes;
-        const easedProgress = easeInOutCubic(progress);
+        const easedProgress = easeInQuad(progress);
         const visibleCount = Math.floor(easedProgress * CONFIG.totalShapes);
         const visibleSet = new Set(drawOrder.slice(0, visibleCount));
 
