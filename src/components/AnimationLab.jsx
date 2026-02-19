@@ -701,7 +701,10 @@ const AnimationLab = () => {
   return (
     <div className="animation-lab">
       <div className="lab-sidebar">
-        <h2>Animation Lab</h2>
+        <div className="lab-header">
+          <h2>Animation Lab</h2>
+          <Link to="/" className="lab-home-link">← Home</Link>
+        </div>
 
         <div className="lab-section">
           <h3>Shape: {selectedShape?.name}</h3>
@@ -939,7 +942,6 @@ const AnimationLab = () => {
       </div>
 
       <div className="lab-main">
-        <Link to="/" className="lab-home-link">← Home</Link>
         <div className="lab-canvas" ref={canvasRef} />
         
         <div className="lab-controls">
