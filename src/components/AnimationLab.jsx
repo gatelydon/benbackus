@@ -149,6 +149,183 @@ const ShapePreview = ({ shapeId, size = 20, stroke = '#888', fill = 'none' }) =>
   );
 };
 
+// Mini arrangement preview for buttons
+const ArrangementPreview = ({ arrangementId, size = 20, stroke = '#888' }) => {
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size * 0.4;
+  
+  const getPath = () => {
+    const points = [];
+    const steps = 32;
+    
+    for (let i = 0; i <= steps; i++) {
+      const t = (i / steps) * Math.PI * 2;
+      let x, y;
+      
+      switch (arrangementId) {
+        case 'circle':
+          x = cx + Math.cos(t) * r;
+          y = cy + Math.sin(t) * r;
+          break;
+        case 'ellipse':
+          x = cx + Math.cos(t) * r * 1.3;
+          y = cy + Math.sin(t) * r * 0.6;
+          break;
+        case 'square': {
+          const progress = i / steps;
+          const side = Math.floor(progress * 4) % 4;
+          const sp = (progress * 4) % 1;
+          const h = r;
+          if (side === 0) { x = cx - h + sp * 2 * h; y = cy - h; }
+          else if (side === 1) { x = cx + h; y = cy - h + sp * 2 * h; }
+          else if (side === 2) { x = cx + h - sp * 2 * h; y = cy + h; }
+          else { x = cx - h; y = cy + h - sp * 2 * h; }
+          break;
+        }
+        case 'figure8':
+          x = cx + Math.sin(t) * r;
+          y = cy + Math.sin(t * 2) * r * 0.5;
+          break;
+        case 'spiral': {
+          const sr = r * 0.3 + r * 0.7 * (i / steps);
+          x = cx + Math.cos(t * 3) * sr;
+          y = cy + Math.sin(t * 3) * sr;
+          break;
+        }
+        case 'lissajous':
+          x = cx + Math.sin(3 * t) * r;
+          y = cy + Math.sin(2 * t) * r;
+          break;
+        case 'lissajous34':
+          x = cx + Math.sin(3 * t) * r;
+          y = cy + Math.sin(4 * t) * r;
+          break;
+        case 'rose3': {
+          const rr = r * Math.cos(3 * t);
+          x = cx + rr * Math.cos(t);
+          y = cy + rr * Math.sin(t);
+          break;
+        }
+        case 'rose5': {
+          const rr = r * Math.cos(5 * t);
+          x = cx + rr * Math.cos(t);
+          y = cy + rr * Math.sin(t);
+          break;
+        }
+        case 'rose8': {
+          const rr = r * Math.cos(4 * t);
+          x = cx + rr * Math.cos(t);
+          y = cy + rr * Math.sin(t);
+          break;
+        }
+        case 'cardioid': {
+          const rr = r * 0.45 * (1 - Math.cos(t));
+          x = cx + rr * Math.cos(t);
+          y = cy + rr * Math.sin(t);
+          break;
+        }
+        case 'astroid':
+          x = cx + r * Math.pow(Math.cos(t), 3);
+          y = cy + r * Math.pow(Math.sin(t), 3);
+          break;
+        case 'lemniscate': {
+          const cos2 = Math.cos(2 * t);
+          const rr = r * 0.9 * Math.sqrt(Math.abs(cos2));
+          x = cx + rr * Math.cos(t) * Math.sign(cos2);
+          y = cy + rr * Math.sin(t);
+          break;
+        }
+        case 'heart': {
+          const scale = r / 16;
+          x = cx + scale * 16 * Math.pow(Math.sin(t), 3);
+          y = cy - scale * (13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+          break;
+        }
+        case 'butterfly': {
+          const exp = Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5);
+          const scale = r / 4;
+          x = cx + Math.sin(t) * exp * scale;
+          y = cy - Math.cos(t) * exp * scale;
+          break;
+        }
+        case 'wave':
+          x = cx + ((i / steps) - 0.5) * r * 2.5;
+          y = cy + Math.sin((i / steps) * Math.PI * 4) * r * 0.5;
+          break;
+        case 'triangle': {
+          const progress = i / steps;
+          const side = Math.floor(progress * 3) % 3;
+          const sp = (progress * 3) % 1;
+          const verts = [
+            [cx, cy - r], [cx + r * 0.866, cy + r * 0.5], [cx - r * 0.866, cy + r * 0.5]
+          ];
+          const start = verts[side];
+          const end = verts[(side + 1) % 3];
+          x = start[0] + (end[0] - start[0]) * sp;
+          y = start[1] + (end[1] - start[1]) * sp;
+          break;
+        }
+        case 'pentagonpath':
+        case 'hexagon': {
+          const sides = arrangementId === 'pentagonpath' ? 5 : 6;
+          const progress = i / steps;
+          const side = Math.floor(progress * sides) % sides;
+          const sp = (progress * sides) % 1;
+          const a1 = (side / sides) * Math.PI * 2 - Math.PI / 2;
+          const a2 = ((side + 1) / sides) * Math.PI * 2 - Math.PI / 2;
+          x = cx + Math.cos(a1) * r + (Math.cos(a2) - Math.cos(a1)) * r * sp;
+          y = cy + Math.sin(a1) * r + (Math.sin(a2) - Math.sin(a1)) * r * sp;
+          break;
+        }
+        default:
+          // For grid, honeycomb, phyllotaxis, etc - just show dots
+          x = cx + Math.cos(t) * r * 0.8;
+          y = cy + Math.sin(t) * r * 0.8;
+      }
+      
+      if (!isNaN(x) && !isNaN(y)) {
+        points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+      }
+    }
+    
+    return points.join(' ');
+  };
+
+  // For scatter/grid types, show dots instead
+  const isDotPattern = ['grid', 'honeycomb', 'phyllotaxis', 'doublehelix', 'fermat', 'concentric', 'starburst', 'random'].includes(arrangementId);
+  
+  if (isDotPattern) {
+    const dots = [];
+    const count = 9;
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
+      const dr = r * (0.4 + Math.random() * 0.5);
+      dots.push({ x: cx + Math.cos(angle) * dr, y: cy + Math.sin(angle) * dr });
+    }
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {dots.map((d, i) => (
+          <circle key={i} cx={d.x} cy={d.y} r={1} fill={stroke} />
+        ))}
+      </svg>
+    );
+  }
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <polyline 
+        points={getPath()} 
+        stroke={stroke} 
+        fill="none" 
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
+
 const STORAGE_KEY = 'animationLabConfig';
 
 // Load config from localStorage or use default
@@ -905,7 +1082,11 @@ const AnimationLab = () => {
                 onClick={() => handleConfigChange('arrangement', a.id)}
                 title={a.name}
               >
-                {a.name.replace(/[()]/g, '').substring(0, 8)}
+                <ArrangementPreview 
+                  arrangementId={a.id} 
+                  size={20} 
+                  stroke={config.arrangement === a.id ? '#fff' : '#555'}
+                />
               </button>
             ))}
           </div>
