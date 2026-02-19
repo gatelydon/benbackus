@@ -75,7 +75,7 @@ function HeaderAnimation() {
       window.location.href = `${process.env.PUBLIC_URL}/#/animation-lab`;
     };
 
-    // Create invisible clickable overlay for left figure-8
+    // Create visible clickable overlay for left figure-8 (debug mode)
     const leftOverlay = document.createElement('div');
     const overlayPadding = CONFIG.shapeSize;
     leftOverlay.style.cssText = `
@@ -87,12 +87,21 @@ function HeaderAnimation() {
       cursor: pointer;
       pointer-events: auto;
       z-index: 9999;
-      -webkit-tap-highlight-color: transparent;
+      border: 2px solid red;
+      background: transparent;
+      -webkit-tap-highlight-color: rgba(255, 0, 0, 0.3);
     `;
-    leftOverlay.addEventListener('click', navigateToAnimationLab);
+    leftOverlay.addEventListener('click', () => {
+      leftOverlay.style.background = 'rgba(0, 255, 0, 0.5)';
+      setTimeout(navigateToAnimationLab, 200);
+    });
+    leftOverlay.addEventListener('touchstart', () => {
+      leftOverlay.style.background = 'rgba(0, 0, 255, 0.5)';
+    });
     leftOverlay.addEventListener('touchend', (e) => {
       e.preventDefault();
-      navigateToAnimationLab();
+      leftOverlay.style.background = 'rgba(0, 255, 0, 0.5)';
+      setTimeout(navigateToAnimationLab, 200);
     });
     wrapper.appendChild(leftOverlay);
 
@@ -110,12 +119,21 @@ function HeaderAnimation() {
         cursor: pointer;
         pointer-events: auto;
         z-index: 9999;
-        -webkit-tap-highlight-color: transparent;
+        border: 2px solid red;
+        background: transparent;
+        -webkit-tap-highlight-color: rgba(255, 0, 0, 0.3);
       `;
-      rightOverlay.addEventListener('click', navigateToAnimationLab);
+      rightOverlay.addEventListener('click', () => {
+        rightOverlay.style.background = 'rgba(0, 255, 0, 0.5)';
+        setTimeout(navigateToAnimationLab, 200);
+      });
+      rightOverlay.addEventListener('touchstart', () => {
+        rightOverlay.style.background = 'rgba(0, 0, 255, 0.5)';
+      });
       rightOverlay.addEventListener('touchend', (e) => {
         e.preventDefault();
-        navigateToAnimationLab();
+        rightOverlay.style.background = 'rgba(0, 255, 0, 0.5)';
+        setTimeout(navigateToAnimationLab, 200);
       });
       wrapper.appendChild(rightOverlay);
     }
