@@ -86,9 +86,14 @@ function HeaderAnimation() {
       height: ${radius + overlayPadding * 2}px;
       cursor: pointer;
       pointer-events: auto;
-      z-index: 10;
+      z-index: 9999;
+      -webkit-tap-highlight-color: transparent;
     `;
     leftOverlay.addEventListener('click', navigateToAnimationLab);
+    leftOverlay.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      navigateToAnimationLab();
+    });
     wrapper.appendChild(leftOverlay);
 
     // Create overlay for right figure-8 (desktop only)
@@ -104,9 +109,14 @@ function HeaderAnimation() {
         height: ${radius + overlayPadding * 2}px;
         cursor: pointer;
         pointer-events: auto;
-        z-index: 10;
+        z-index: 9999;
+        -webkit-tap-highlight-color: transparent;
       `;
       rightOverlay.addEventListener('click', navigateToAnimationLab);
+      rightOverlay.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        navigateToAnimationLab();
+      });
       wrapper.appendChild(rightOverlay);
     }
     
