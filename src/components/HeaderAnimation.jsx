@@ -57,11 +57,6 @@ function HeaderAnimation() {
     document.body.appendChild(wrapper);
     wrapperRef.current = wrapper;
 
-    // Navigate to animation lab
-    const navigateToAnimationLab = () => {
-      window.location.href = `${process.env.PUBLIC_URL}/#/animation-lab`;
-    };
-
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
     const isMobile = windowWidth < 768;
@@ -74,6 +69,44 @@ function HeaderAnimation() {
     const centerX = isMobile ? windowWidth / 2 : 200 + CONFIG.arrangementRadius;
     const centerY = isMobile ? windowHeight * 0.35 : windowHeight / 2;
     const radius = isMobile ? mobileRadius : CONFIG.arrangementRadius;
+
+    // Navigate to animation lab
+    const navigateToAnimationLab = () => {
+      window.location.href = `${process.env.PUBLIC_URL}/#/animation-lab`;
+    };
+
+    // Create invisible clickable overlay for left figure-8
+    const leftOverlay = document.createElement('div');
+    const overlayPadding = CONFIG.shapeSize;
+    leftOverlay.style.cssText = `
+      position: absolute;
+      left: ${centerX - radius - overlayPadding}px;
+      top: ${centerY - radius * 0.5 - overlayPadding}px;
+      width: ${radius * 2 + overlayPadding * 2}px;
+      height: ${radius + overlayPadding * 2}px;
+      cursor: pointer;
+      z-index: 1;
+    `;
+    leftOverlay.addEventListener('click', navigateToAnimationLab);
+    wrapper.appendChild(leftOverlay);
+
+    // Create overlay for right figure-8 (desktop only)
+    let rightOverlay = null;
+    if (!isMobile) {
+      const rightCenterX = windowWidth - 200 - CONFIG.arrangementRadius;
+      rightOverlay = document.createElement('div');
+      rightOverlay.style.cssText = `
+        position: absolute;
+        left: ${rightCenterX - radius - overlayPadding}px;
+        top: ${centerY - radius * 0.5 - overlayPadding}px;
+        width: ${radius * 2 + overlayPadding * 2}px;
+        height: ${radius + overlayPadding * 2}px;
+        cursor: pointer;
+        z-index: 1;
+      `;
+      rightOverlay.addEventListener('click', navigateToAnimationLab);
+      wrapper.appendChild(rightOverlay);
+    }
     
     for (let i = 0; i < CONFIG.totalShapes; i++) {
       const progress = i / CONFIG.totalShapes;
@@ -105,13 +138,11 @@ function HeaderAnimation() {
         top: ${data.y}px;
         transform: rotate(${data.baseRotation}deg);
         transform-origin: center center;
-        pointer-events: auto;
-        cursor: pointer;
+        pointer-events: none;
         opacity: 0;
       `;
       svg.dataset.index = data.index;
       svg.dataset.baseRotation = data.baseRotation;
-      svg.addEventListener('click', navigateToAnimationLab);
 
       const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
       polygon.setAttribute('points', starPath);
@@ -139,14 +170,12 @@ function HeaderAnimation() {
           top: ${data.y}px;
           transform: rotate(${-data.baseRotation}deg);
           transform-origin: center center;
-          pointer-events: auto;
-          cursor: pointer;
+          pointer-events: none;
           opacity: 0;
         `;
         svg.dataset.index = data.index;
         svg.dataset.baseRotation = -data.baseRotation;
         svg.dataset.mirror = 'true';
-        svg.addEventListener('click', navigateToAnimationLab);
 
         const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
         polygon.setAttribute('points', starPath);
