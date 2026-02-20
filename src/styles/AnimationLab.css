@@ -176,6 +176,77 @@ html, body, #root, .App {
   border-color: #666;
 }
 
+/* Wheel Picker (iOS-style scroll selector) */
+.wheel-pickers-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.wheel-picker-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.wheel-picker-label {
+  font-size: 0.65rem;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+  text-align: center;
+}
+
+.wheel-picker {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #0a0a0a;
+}
+
+.wheel-picker-highlight {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wheel-picker-scroll {
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  height: 100%;
+}
+
+.wheel-picker-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.wheel-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.wheel-picker-item.selected {
+  opacity: 1 !important;
+}
+
+.wheel-item-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .shape-btn.active {
   background: #444;
   border-color: #888;
@@ -663,6 +734,27 @@ html, body, #root, .App {
   .lab-section h3 {
     font-size: 0.7rem;
     margin-bottom: 0.4rem;
+  }
+
+  .wheel-pickers-row {
+    gap: 0.5rem;
+  }
+
+  .wheel-picker {
+    height: 140px !important;
+  }
+
+  .wheel-picker-label {
+    font-size: 0.55rem;
+  }
+
+  .wheel-picker-item {
+    height: 28px !important;
+  }
+
+  .wheel-item-content svg {
+    width: 20px;
+    height: 20px;
   }
 
   .shape-buttons {

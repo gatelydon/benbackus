@@ -417,6 +417,93 @@ const ArrangementPreview = ({ arrangementId, size = 20, stroke = '#888' }) => {
   );
 };
 
+// Wheel picker component (iOS-style scroll selector)
+const WheelPicker = ({ items, value, onChange, renderItem, itemHeight = 40 }) => {
+  const containerRef = useRef(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollTimeout = useRef(null);
+  
+  const selectedIndex = items.findIndex(item => item.id === value);
+  const visibleItems = 5; // Show 5 items at a time
+  const containerHeight = itemHeight * visibleItems;
+  const paddingItems = Math.floor(visibleItems / 2);
+  
+  // Scroll to selected item on mount and when value changes externally
+  useEffect(() => {
+    if (containerRef.current && !isScrolling) {
+      const scrollTop = selectedIndex * itemHeight;
+      containerRef.current.scrollTop = scrollTop;
+    }
+  }, [value, selectedIndex, itemHeight, isScrolling]);
+  
+  const handleScroll = (e) => {
+    setIsScrolling(true);
+    
+    if (scrollTimeout.current) {
+      clearTimeout(scrollTimeout.current);
+    }
+    
+    scrollTimeout.current = setTimeout(() => {
+      const scrollTop = e.target.scrollTop;
+      const newIndex = Math.round(scrollTop / itemHeight);
+      const clampedIndex = Math.max(0, Math.min(items.length - 1, newIndex));
+      
+      if (items[clampedIndex] && items[clampedIndex].id !== value) {
+        onChange(items[clampedIndex].id);
+      }
+      
+      // Snap to position
+      e.target.scrollTop = clampedIndex * itemHeight;
+      setIsScrolling(false);
+    }, 100);
+  };
+  
+  return (
+    <div className="wheel-picker" style={{ height: containerHeight }}>
+      <div className="wheel-picker-highlight" style={{ 
+        top: paddingItems * itemHeight,
+        height: itemHeight 
+      }} />
+      <div 
+        className="wheel-picker-scroll"
+        ref={containerRef}
+        onScroll={handleScroll}
+        style={{ 
+          paddingTop: paddingItems * itemHeight,
+          paddingBottom: paddingItems * itemHeight
+        }}
+      >
+        {items.map((item, index) => {
+          const isSelected = item.id === value;
+          const distance = Math.abs(index - selectedIndex);
+          const opacity = isSelected ? 1 : Math.max(0.3, 1 - distance * 0.25);
+          const scale = isSelected ? 1 : Math.max(0.7, 1 - distance * 0.1);
+          
+          return (
+            <div 
+              key={item.id}
+              className={`wheel-picker-item ${isSelected ? 'selected' : ''}`}
+              style={{ 
+                height: itemHeight,
+                opacity,
+                transform: `scale(${scale})`
+              }}
+              onClick={() => {
+                onChange(item.id);
+                if (containerRef.current) {
+                  containerRef.current.scrollTop = index * itemHeight;
+                }
+              }}
+            >
+              {renderItem(item, isSelected)}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const STORAGE_KEY = 'animationLabConfig';
 
 // Load config from localStorage or use default
@@ -1109,24 +1196,49 @@ const AnimationLab = () => {
         </div>
 
         <div className="lab-section">
-          <h3>Shape: {selectedShape?.name}</h3>
-          <div className="shape-buttons">
-            {SHAPES.map(s => (
-              <button
-                key={s.id}
-                className={`shape-btn ${config.shape === s.id ? 'active' : ''}`}
-                onClick={() => handleConfigChange('shape', s.id)}
-                title={s.name}
-              >
-                <ShapePreview 
-                  shapeId={s.id} 
-                  size={18} 
-                  stroke={config.shape === s.id ? '#fff' : '#555'}
-                />
-              </button>
-            ))}
+          <h3>Shape & Arrangement</h3>
+          <div className="wheel-pickers-row">
+            <div className="wheel-picker-col">
+              <div className="wheel-picker-label">Shape</div>
+              <WheelPicker
+                items={SHAPES}
+                value={config.shape}
+                onChange={(id) => handleConfigChange('shape', id)}
+                itemHeight={36}
+                renderItem={(item, isSelected) => (
+                  <div className="wheel-item-content">
+                    <ShapePreview 
+                      shapeId={item.id} 
+                      size={24} 
+                      stroke={isSelected ? '#fff' : '#666'}
+                    />
+                  </div>
+                )}
+              />
+            </div>
+            <div className="wheel-picker-col">
+              <div className="wheel-picker-label">Arrangement</div>
+              <WheelPicker
+                items={ARRANGEMENTS}
+                value={config.arrangement}
+                onChange={(id) => handleConfigChange('arrangement', id)}
+                itemHeight={36}
+                renderItem={(item, isSelected) => (
+                  <div className="wheel-item-content">
+                    <ArrangementPreview 
+                      arrangementId={item.id} 
+                      size={24} 
+                      stroke={isSelected ? '#fff' : '#666'}
+                    />
+                  </div>
+                )}
+              />
+            </div>
           </div>
+        </div>
 
+        <div className="lab-section">
+          <h3>Shape Options</h3>
           <label className="lab-checkbox">
             <input
               type="checkbox"
@@ -1164,24 +1276,7 @@ const AnimationLab = () => {
         </div>
 
         <div className="lab-section">
-          <h3>Arrangement</h3>
-          <div className="arrangement-buttons">
-            {ARRANGEMENTS.map(a => (
-              <button
-                key={a.id}
-                className={`arr-btn ${config.arrangement === a.id ? 'active' : ''}`}
-                onClick={() => handleConfigChange('arrangement', a.id)}
-                title={a.name}
-              >
-                <ArrangementPreview 
-                  arrangementId={a.id} 
-                  size={20} 
-                  stroke={config.arrangement === a.id ? '#fff' : '#555'}
-                />
-              </button>
-            ))}
-          </div>
-
+          <h3>Arrangement Options</h3>
           <div className="lab-row">
             <label>Anchor:</label>
             <select
