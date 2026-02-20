@@ -57,9 +57,36 @@ const ANCHORS = [
   { id: 'tangent', name: 'Follow Circle' },
 ];
 
+const ANIMATION_STYLES = [
+  // Rotation
+  { id: 'spin', name: 'Continuous Spin', category: 'rotation' },
+  { id: 'oscillate', name: 'Oscillate', category: 'rotation' },
+  { id: 'pulse-spin', name: 'Pulse Spin', category: 'rotation' },
+  // Movement
+  { id: 'orbit', name: 'Circle Orbit', category: 'movement' },
+  { id: 'triangle-path', name: 'Triangle Path', category: 'movement' },
+  { id: 'square-path', name: 'Square Path', category: 'movement' },
+  { id: 'figure8', name: 'Figure-8', category: 'movement' },
+  { id: 'jitter', name: 'Jitter', category: 'movement' },
+  // Scale
+  { id: 'breathe', name: 'Breathe', category: 'scale' },
+  { id: 'heartbeat', name: 'Heartbeat', category: 'scale' },
+  { id: 'pop', name: 'Pop', category: 'scale' },
+  // Morph
+  { id: 'shape-cycle', name: 'Shape Cycle', category: 'morph' },
+  { id: 'star-evolve', name: 'Star Evolution', category: 'morph' },
+  // Combined
+  { id: 'orbit-spin', name: 'Orbit + Spin', category: 'combined' },
+  { id: 'breathe-oscillate', name: 'Breathe + Rock', category: 'combined' },
+  // Phase
+  { id: 'wave', name: 'Wave', category: 'phase' },
+  { id: 'none', name: 'Static', category: 'none' },
+];
+
 const DEFAULT_CONFIG = {
   shape: 'star3',
   arrangement: 'rose8',
+  animationStyle: 'spin',
   anchor: 'top-left',
   startingPoints: 6,
   totalShapes: 342,
@@ -415,6 +442,150 @@ const ArrangementPreview = ({ arrangementId, size = 20, stroke = '#888' }) => {
       />
     </svg>
   );
+};
+
+// Animation style preview icons
+const AnimationStylePreview = ({ styleId, size = 28, stroke = '#888' }) => {
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size * 0.35;
+  
+  switch (styleId) {
+    case 'spin':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <circle cx={cx} cy={cy} r={r} stroke={stroke} fill="none" strokeWidth="1" strokeDasharray="4 2" />
+          <path d={`M${cx + r - 2} ${cy - 3} L${cx + r + 2} ${cy} L${cx + r - 2} ${cy + 3}`} fill={stroke} />
+        </svg>
+      );
+    case 'oscillate':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <path d={`M${cx - r} ${cy} Q${cx} ${cy - r * 0.8} ${cx + r} ${cy}`} stroke={stroke} fill="none" strokeWidth="1.5" />
+          <path d={`M${cx - r + 2} ${cy - 3} L${cx - r - 1} ${cy} L${cx - r + 2} ${cy + 3}`} fill={stroke} />
+          <path d={`M${cx + r - 2} ${cy - 3} L${cx + r + 1} ${cy} L${cx + r - 2} ${cy + 3}`} fill={stroke} />
+        </svg>
+      );
+    case 'pulse-spin':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <circle cx={cx} cy={cy} r={r * 0.5} stroke={stroke} fill="none" strokeWidth="1" />
+          <circle cx={cx} cy={cy} r={r} stroke={stroke} fill="none" strokeWidth="1" strokeDasharray="2 3" />
+        </svg>
+      );
+    case 'orbit':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <circle cx={cx} cy={cy} r={r} stroke={stroke} fill="none" strokeWidth="1" strokeDasharray="3 2" />
+          <circle cx={cx + r} cy={cy} r={3} fill={stroke} />
+        </svg>
+      );
+    case 'triangle-path':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <polygon points={`${cx},${cy - r} ${cx + r * 0.866},${cy + r * 0.5} ${cx - r * 0.866},${cy + r * 0.5}`} 
+            stroke={stroke} fill="none" strokeWidth="1" />
+          <circle cx={cx} cy={cy - r} r={2.5} fill={stroke} />
+        </svg>
+      );
+    case 'square-path':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <rect x={cx - r} y={cy - r} width={r * 2} height={r * 2} stroke={stroke} fill="none" strokeWidth="1" />
+          <circle cx={cx - r} cy={cy - r} r={2.5} fill={stroke} />
+        </svg>
+      );
+    case 'figure8':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <path d={`M${cx} ${cy} C${cx - r} ${cy - r * 0.8} ${cx - r} ${cy + r * 0.8} ${cx} ${cy} C${cx + r} ${cy - r * 0.8} ${cx + r} ${cy + r * 0.8} ${cx} ${cy}`} 
+            stroke={stroke} fill="none" strokeWidth="1" />
+        </svg>
+      );
+    case 'jitter':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <circle cx={cx - 2} cy={cy - 1} r={2} fill={stroke} opacity="0.4" />
+          <circle cx={cx + 1} cy={cy + 2} r={2} fill={stroke} opacity="0.4" />
+          <circle cx={cx} cy={cy} r={3} fill={stroke} />
+          <circle cx={cx + 3} cy={cy - 2} r={2} fill={stroke} opacity="0.4" />
+        </svg>
+      );
+    case 'breathe':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <circle cx={cx} cy={cy} r={r * 0.4} stroke={stroke} fill="none" strokeWidth="1" />
+          <circle cx={cx} cy={cy} r={r * 0.7} stroke={stroke} fill="none" strokeWidth="1" strokeDasharray="2 2" />
+          <circle cx={cx} cy={cy} r={r} stroke={stroke} fill="none" strokeWidth="1" strokeDasharray="2 2" />
+        </svg>
+      );
+    case 'heartbeat':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <path d={`M${cx - r} ${cy} L${cx - r * 0.5} ${cy} L${cx - r * 0.3} ${cy - r * 0.6} L${cx} ${cy + r * 0.4} L${cx + r * 0.3} ${cy - r * 0.3} L${cx + r * 0.5} ${cy} L${cx + r} ${cy}`} 
+            stroke={stroke} fill="none" strokeWidth="1.5" />
+        </svg>
+      );
+    case 'pop':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <circle cx={cx} cy={cy} r={r * 0.5} fill={stroke} />
+          <line x1={cx - r} y1={cy - r} x2={cx - r * 0.6} y2={cy - r * 0.6} stroke={stroke} strokeWidth="1.5" />
+          <line x1={cx + r} y1={cy - r} x2={cx + r * 0.6} y2={cy - r * 0.6} stroke={stroke} strokeWidth="1.5" />
+          <line x1={cx - r} y1={cy + r} x2={cx - r * 0.6} y2={cy + r * 0.6} stroke={stroke} strokeWidth="1.5" />
+          <line x1={cx + r} y1={cy + r} x2={cx + r * 0.6} y2={cy + r * 0.6} stroke={stroke} strokeWidth="1.5" />
+        </svg>
+      );
+    case 'shape-cycle':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <polygon points={`${cx - r * 0.8},${cy + r * 0.3} ${cx - r * 0.3},${cy - r * 0.6} ${cx + r * 0.4},${cy + r * 0.3}`} 
+            stroke={stroke} fill="none" strokeWidth="1" />
+          <rect x={cx - r * 0.15} y={cy - r * 0.15} width={r * 0.8} height={r * 0.8} 
+            stroke={stroke} fill="none" strokeWidth="1" transform={`rotate(15 ${cx} ${cy})`} />
+        </svg>
+      );
+    case 'star-evolve':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <polygon points={`${cx},${cy - r * 0.9} ${cx + r * 0.3},${cy - r * 0.1} ${cx + r * 0.9},${cy + r * 0.3} ${cx + r * 0.2},${cy + r * 0.6} ${cx - r * 0.2},${cy + r * 0.6} ${cx - r * 0.9},${cy + r * 0.3} ${cx - r * 0.3},${cy - r * 0.1}`} 
+            stroke={stroke} fill="none" strokeWidth="1" />
+        </svg>
+      );
+    case 'orbit-spin':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <circle cx={cx} cy={cy} r={r} stroke={stroke} fill="none" strokeWidth="1" strokeDasharray="3 2" />
+          <g transform={`translate(${cx + r}, ${cy})`}>
+            <rect x={-3} y={-3} width={6} height={6} stroke={stroke} fill="none" strokeWidth="1" transform="rotate(30)" />
+          </g>
+        </svg>
+      );
+    case 'breathe-oscillate':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <ellipse cx={cx} cy={cy} rx={r} ry={r * 0.5} stroke={stroke} fill="none" strokeWidth="1" />
+          <ellipse cx={cx} cy={cy} rx={r * 0.6} ry={r * 0.3} stroke={stroke} fill="none" strokeWidth="1" />
+        </svg>
+      );
+    case 'wave':
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <path d={`M${cx - r} ${cy + r * 0.3} Q${cx - r * 0.5} ${cy - r * 0.5} ${cx} ${cy} Q${cx + r * 0.5} ${cy + r * 0.5} ${cx + r} ${cy - r * 0.3}`} 
+            stroke={stroke} fill="none" strokeWidth="1.5" />
+          <circle cx={cx - r * 0.7} cy={cy + r * 0.15} r={2} fill={stroke} />
+          <circle cx={cx} cy={cy} r={2.5} fill={stroke} />
+          <circle cx={cx + r * 0.7} cy={cy - r * 0.15} r={2} fill={stroke} />
+        </svg>
+      );
+    case 'none':
+    default:
+      return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <rect x={cx - r * 0.4} y={cy - r * 0.4} width={r * 0.8} height={r * 0.8} stroke={stroke} fill="none" strokeWidth="1.5" />
+        </svg>
+      );
+  }
 };
 
 // Wheel picker component (iOS-style scroll selector)
@@ -957,10 +1128,132 @@ const AnimationLab = () => {
     });
   }, [shapeData, config.shape, config.borderColor, config.fillColor, config.useGradient, config.gradientStart, config.gradientEnd]);
 
-  // Update visibility and rotation based on current frame
-  // First half: draw shapes in order
-  // Second half: hide shapes in same order (shuffle out)
-  // OR if keepAllVisible: all shapes stay visible, only rotation animates
+  // Calculate animation transform based on style
+  const getAnimationTransform = useCallback((styleId, frame, idx, totalShapes, baseRotation, speed) => {
+    const t = frame * speed * 0.05; // time factor
+    const phase = (idx / totalShapes) * Math.PI * 2; // phase offset based on shape index
+    
+    switch (styleId) {
+      case 'spin':
+        return { rotate: baseRotation + frame * speed, scale: 1, x: 0, y: 0 };
+      
+      case 'oscillate': {
+        const angle = Math.sin(t + phase) * 45; // oscillate ±45 degrees
+        return { rotate: baseRotation + angle, scale: 1, x: 0, y: 0 };
+      }
+      
+      case 'pulse-spin': {
+        const speedMod = 1 + Math.sin(t * 0.5) * 0.5; // speed varies 0.5x to 1.5x
+        return { rotate: baseRotation + frame * speed * speedMod, scale: 1, x: 0, y: 0 };
+      }
+      
+      case 'orbit': {
+        const orbitR = 5;
+        const x = Math.cos(t + phase) * orbitR;
+        const y = Math.sin(t + phase) * orbitR;
+        return { rotate: baseRotation, scale: 1, x, y };
+      }
+      
+      case 'triangle-path': {
+        const triPhase = ((t + phase) % (Math.PI * 2)) / (Math.PI * 2);
+        const triR = 5;
+        let x, y;
+        if (triPhase < 0.333) {
+          const p = triPhase / 0.333;
+          x = triR * (1 - p) + triR * -0.5 * p;
+          y = -triR * 0.866 * p;
+        } else if (triPhase < 0.666) {
+          const p = (triPhase - 0.333) / 0.333;
+          x = triR * -0.5 * (1 - p) + triR * -0.5 * p;
+          y = -triR * 0.866 * (1 - p) + triR * 0.866 * p;
+        } else {
+          const p = (triPhase - 0.666) / 0.334;
+          x = triR * -0.5 * (1 - p) + triR * p;
+          y = triR * 0.866 * (1 - p);
+        }
+        return { rotate: baseRotation, scale: 1, x, y };
+      }
+      
+      case 'square-path': {
+        const sqPhase = ((t + phase) % (Math.PI * 2)) / (Math.PI * 2);
+        const sqR = 5;
+        let x, y;
+        if (sqPhase < 0.25) { x = sqR; y = -sqR + sqPhase * 4 * 2 * sqR; }
+        else if (sqPhase < 0.5) { x = sqR - (sqPhase - 0.25) * 4 * 2 * sqR; y = sqR; }
+        else if (sqPhase < 0.75) { x = -sqR; y = sqR - (sqPhase - 0.5) * 4 * 2 * sqR; }
+        else { x = -sqR + (sqPhase - 0.75) * 4 * 2 * sqR; y = -sqR; }
+        return { rotate: baseRotation, scale: 1, x, y };
+      }
+      
+      case 'figure8': {
+        const f8R = 6;
+        const x = Math.sin(t + phase) * f8R;
+        const y = Math.sin((t + phase) * 2) * f8R * 0.5;
+        return { rotate: baseRotation, scale: 1, x, y };
+      }
+      
+      case 'jitter': {
+        const jx = (Math.sin(t * 7 + phase * 3) + Math.sin(t * 11 + phase * 5)) * 2;
+        const jy = (Math.cos(t * 9 + phase * 4) + Math.cos(t * 13 + phase * 2)) * 2;
+        return { rotate: baseRotation, scale: 1, x: jx, y: jy };
+      }
+      
+      case 'breathe': {
+        const scale = 1 + Math.sin(t + phase) * 0.2; // scale 0.8 to 1.2
+        return { rotate: baseRotation, scale, x: 0, y: 0 };
+      }
+      
+      case 'heartbeat': {
+        const beatPhase = (t + phase) % (Math.PI * 2);
+        let scale;
+        if (beatPhase < Math.PI * 0.3) {
+          scale = 1 + Math.sin(beatPhase / 0.3 * Math.PI) * 0.3; // quick expand
+        } else {
+          scale = 1 + Math.sin(Math.PI) * 0.3 * (1 - (beatPhase - Math.PI * 0.3) / (Math.PI * 1.7)); // slow contract
+        }
+        return { rotate: baseRotation, scale: Math.max(0.7, scale), x: 0, y: 0 };
+      }
+      
+      case 'pop': {
+        const popPhase = (t * 2 + phase) % (Math.PI * 2);
+        const scale = popPhase < 0.5 ? 1 + popPhase * 0.6 : 1.3 - (popPhase - 0.5) * 0.6 / (Math.PI * 2 - 0.5);
+        return { rotate: baseRotation, scale: Math.max(0.8, Math.min(1.3, scale)), x: 0, y: 0 };
+      }
+      
+      case 'shape-cycle':
+      case 'star-evolve':
+        // These would need shape morphing which requires more complex SVG manipulation
+        // For now, just do a rotation + scale combo
+        return { rotate: baseRotation + frame * speed * 0.5, scale: 1 + Math.sin(t) * 0.1, x: 0, y: 0 };
+      
+      case 'orbit-spin': {
+        const orbitR = 5;
+        const x = Math.cos(t + phase) * orbitR;
+        const y = Math.sin(t + phase) * orbitR;
+        return { rotate: baseRotation + frame * speed, scale: 1, x, y };
+      }
+      
+      case 'breathe-oscillate': {
+        const scale = 1 + Math.sin(t + phase) * 0.15;
+        const angle = Math.sin(t * 0.7 + phase) * 30;
+        return { rotate: baseRotation + angle, scale, x: 0, y: 0 };
+      }
+      
+      case 'wave': {
+        // Wave effect - animation ripples based on index
+        const waveT = t - idx * 0.05;
+        const scale = 1 + Math.sin(waveT) * 0.2;
+        const y = Math.sin(waveT) * 3;
+        return { rotate: baseRotation, scale, x: 0, y };
+      }
+      
+      case 'none':
+      default:
+        return { rotate: baseRotation, scale: 1, x: 0, y: 0 };
+    }
+  }, []);
+
+  // Update visibility and animation based on current frame
   useEffect(() => {
     const totalShapes = config.totalShapes;
     
@@ -969,14 +1262,13 @@ const AnimationLab = () => {
       const baseRotation = parseFloat(svg.dataset.baseRotation || 0);
       
       if (config.keepAllVisible) {
-        // All shapes always visible
         svg.style.opacity = '1';
         
-        // Apply continuous rotation if enabled
-        if (config.animatedRotation) {
-          const animatedAngle = baseRotation + (currentFrame * config.rotationSpeed);
-          svg.style.transform = `rotate(${animatedAngle}deg)`;
-        }
+        // Apply animation style
+        const anim = getAnimationTransform(
+          config.animationStyle, currentFrame, idx, totalShapes, baseRotation, config.rotationSpeed
+        );
+        svg.style.transform = `translate(${anim.x}px, ${anim.y}px) rotate(${anim.rotate}deg) scale(${anim.scale})`;
       } else {
         // Normal draw/hide cycle
         let visibleSet;
@@ -990,13 +1282,15 @@ const AnimationLab = () => {
         const isVisible = visibleSet.has(idx);
         svg.style.opacity = isVisible ? '1' : '0';
         
-        if (config.animatedRotation && isVisible) {
-          const animatedAngle = baseRotation + (currentFrame * config.rotationSpeed);
-          svg.style.transform = `rotate(${animatedAngle}deg)`;
+        if (isVisible) {
+          const anim = getAnimationTransform(
+            config.animationStyle, currentFrame, idx, totalShapes, baseRotation, config.rotationSpeed
+          );
+          svg.style.transform = `translate(${anim.x}px, ${anim.y}px) rotate(${anim.rotate}deg) scale(${anim.scale})`;
         }
       }
     });
-  }, [currentFrame, drawOrder, config.totalShapes, config.animatedRotation, config.rotationSpeed, config.keepAllVisible]);
+  }, [currentFrame, drawOrder, config.totalShapes, config.animationStyle, config.rotationSpeed, config.keepAllVisible, getAnimationTransform]);
 
   // Animation loop
   useEffect(() => {
@@ -1196,7 +1490,7 @@ const AnimationLab = () => {
         </div>
 
         <div className="lab-section">
-          <h3>Shape & Arrangement</h3>
+          <h3>Shape, Arrangement & Animation</h3>
           <div className="wheel-pickers-row">
             <div className="wheel-picker-col">
               <div className="wheel-picker-label">Shape</div>
@@ -1228,6 +1522,24 @@ const AnimationLab = () => {
                     <ArrangementPreview 
                       arrangementId={item.id} 
                       size={24} 
+                      stroke={isSelected ? '#fff' : '#666'}
+                    />
+                  </div>
+                )}
+              />
+            </div>
+            <div className="wheel-picker-col wheel-picker-col-wide">
+              <div className="wheel-picker-label">Animation</div>
+              <WheelPicker
+                items={ANIMATION_STYLES}
+                value={config.animationStyle}
+                onChange={(id) => handleConfigChange('animationStyle', id)}
+                itemHeight={36}
+                renderItem={(item, isSelected) => (
+                  <div className="wheel-item-content">
+                    <AnimationStylePreview 
+                      styleId={item.id} 
+                      size={28} 
                       stroke={isSelected ? '#fff' : '#666'}
                     />
                   </div>
